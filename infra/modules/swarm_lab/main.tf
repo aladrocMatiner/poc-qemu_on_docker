@@ -59,6 +59,12 @@ resource "libvirt_domain" "node" {
 
   cloudinit = libvirt_cloudinit_disk.cloudinit[count.index].id
 
+  console {
+    type        = "pty"
+    target_type = "serial"
+    target_port = "0"
+  }
+
   network_interface {
     mac = local.nodes[count.index].mgmt_mac
     network_name = var.mgmt_mode == "user" ? var.mgmt_network : null
