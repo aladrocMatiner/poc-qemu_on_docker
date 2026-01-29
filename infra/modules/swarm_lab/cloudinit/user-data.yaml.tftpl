@@ -8,6 +8,15 @@ users:
     shell: /bin/bash
     ssh_authorized_keys:
       - ${ssh_pubkey}
+  - name: aladroc
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    lock_passwd: false
+
+chpasswd:
+  list: |
+    aladroc:abcd1234
+  expire: false
 
 package_update: false
 package_upgrade: false
