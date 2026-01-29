@@ -168,3 +168,33 @@ specs:
     related_skills: [ci_smoke_tests_makefile]
     related_runbooks: []
     related_adrs: []
+
+  - id: libvirt-host-setup
+    title: Libvirt host readiness for local lab
+    owner_agent: netops
+    status: draft
+    priority: high
+    dependencies: []
+    related_skills: [libvirt_host_setup]
+    related_runbooks: [docs/runbooks/opentofu-libvirt.md]
+    related_adrs: []
+
+  - id: cloudinit-baseline
+    title: Baseline cloud-init for lab VMs
+    owner_agent: vmops
+    status: draft
+    priority: high
+    dependencies: [libvirt-host-setup]
+    related_skills: [cloudinit_templates]
+    related_runbooks: [docs/runbooks/opentofu-libvirt.md]
+    related_adrs: []
+
+  - id: tofu-inventory-access
+    title: Inventory and SSH access from OpenTofu outputs
+    owner_agent: sre
+    status: draft
+    priority: medium
+    dependencies: [libvirt-host-setup, cloudinit-baseline]
+    related_skills: [tofu_make_integration]
+    related_runbooks: [docs/runbooks/opentofu-libvirt.md]
+    related_adrs: []

@@ -1,0 +1,73 @@
+id: tofu-inventory-access
+title: Inventory and SSH access from OpenTofu outputs
+status: draft
+owner_agent: sre
+priority: medium
+
+problem_statement: |
+  Operators need a reliable way to locate VM management access details
+  regardless of MGMT_MODE, and to use `make lab-ssh` consistently.
+
+scope:
+  - Define inventory JSON format written to work/inventory.json
+  - Support MGMT_MODE user or bridge access discovery
+  - Provide a stable `make lab-ssh` workflow
+
+non_goals:
+  - Exposing VNC/SPICE/RDP to untrusted networks
+  - Persisting sensitive credentials in inventory
+
+constraints:
+  - No secrets in inventory output
+  - Use libvirt leases for discovery when possible
+
+assumptions:
+  - `tofu output -json` is available after apply
+  - libvirt DHCP leases accessible for NAT/bridge networks
+
+interfaces:
+  inputs:
+    - MGMT_MODE
+    - LAB_NAME
+    - MAC_PREFIX
+  outputs:
+    - work/inventory.json
+
+acceptance_tests:
+  - name: lab-up
+    command: "make lab-up"
+    expected: "exit code 0"
+  - name: inventory-created
+    command: "test -f work/inventory.json"
+    expected: "exit code 0"
+  - name: lab-status
+    command: "make lab-status"
+    expected: "inventory.json present and contains node1"
+  - name: ssh-node1
+    command: "make lab-ssh NODE=1 CMD='echo ok'"
+    expected: "prints 'ok'"
+
+rollback:
+  - Destroy lab VMs via `make lab-destroy`
+  - Remove work/inventory.json and related artifacts
+
+security_considerations:
+  - Do not print secrets or private keys
+  - Avoid exposing management access to WAN
+
+artifacts_produced:
+  - Inventory file: work/inventory.json
+  - Skill: skills/tofu_make_integration/skill.md
+  - Runbook: docs/runbooks/opentofu-libvirt.md
+
+dependencies:
+  - libvirt-host-setup
+  - cloudinit-baseline
+
+related_skills:
+  - tofu_make_integration
+
+related_docs:
+  runbooks:
+    - docs/runbooks/opentofu-libvirt.md
+  adrs: []

@@ -1,0 +1,79 @@
+id: libvirt-host-setup
+title: Libvirt host readiness for local lab
+status: draft
+owner_agent: netops
+priority: high
+
+problem_statement: |
+  The local Swarm lab requires a host that can run libvirt-backed QEMU/KVM VMs
+  safely and predictably, without destructive changes to existing networking.
+
+scope:
+  - Verify CPU virtualization support and /dev/kvm access
+  - Validate libvirt daemon availability and virsh connectivity
+  - Validate required host bridges based on MGMT_MODE
+
+non_goals:
+  - Auto-creating or modifying host bridges
+  - Reconfiguring existing Docker or host networking
+
+constraints:
+  - No destructive defaults
+  - Do not auto-create host bridges unless explicitly requested
+
+assumptions:
+  - Linux host with KVM-capable CPU
+  - libvirt is installed or installable
+
+interfaces:
+  inputs:
+    - MGMT_MODE
+    - MGMT_BRIDGE
+    - SWARM_BRIDGE
+  outputs:
+    - Host readiness check results
+
+acceptance_tests:
+  - name: cpu-virtualization-flags
+    command: "egrep -q '(vmx|svm)' /proc/cpuinfo"
+    expected: "exit code 0"
+  - name: kvm-device-access
+    command: "test -r /dev/kvm && test -w /dev/kvm"
+    expected: "exit code 0"
+  - name: libvirt-active
+    command: "systemctl is-active libvirtd || systemctl is-active libvirt-daemon"
+    expected: "active"
+  - name: virsh-connect
+    command: "virsh -c qemu:///system list --all"
+    expected: "exit code 0"
+  - name: bridge-checks
+    command: |
+      if [ "${MGMT_MODE}" = "bridge" ]; then
+        ip link show "${MGMT_BRIDGE}" && ip link show "${SWARM_BRIDGE}";
+      else
+        ip link show "${SWARM_BRIDGE}";
+      fi
+    expected: "exit code 0"
+
+rollback:
+  - Document how to remove user from libvirt/kvm groups if added
+  - Document how to stop/disable libvirt services if required
+  - No automatic rollback actions
+
+security_considerations:
+  - Group membership grants VM control; use least privilege
+  - Bridge exposure may expand L2 reachability
+
+artifacts_produced:
+  - Runbook: docs/runbooks/opentofu-libvirt.md
+  - Skill: skills/libvirt_host_setup/skill.md
+
+dependencies: []
+
+related_skills:
+  - libvirt_host_setup
+
+related_docs:
+  runbooks:
+    - docs/runbooks/opentofu-libvirt.md
+  adrs: []

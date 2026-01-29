@@ -1,0 +1,76 @@
+id: cloudinit-baseline
+title: Baseline cloud-init for lab VMs
+status: draft
+owner_agent: vmops
+priority: high
+
+problem_statement: |
+  Lab VMs need a consistent cloud-init baseline to enable SSH access,
+  set hostnames, and install Docker for Swarm operations.
+
+scope:
+  - Provide user-data and meta-data templates
+  - Set hostname and SSH access for SSH_USER
+  - Install Docker via cloud-init
+
+non_goals:
+  - Full OS hardening beyond lab needs
+  - Secrets or passwords in templates
+
+constraints:
+  - No secrets committed to git
+  - Minimal packages and services
+
+assumptions:
+  - cloud-init runs on first boot
+  - SSH public key is available locally
+
+interfaces:
+  inputs:
+    - LAB_NAME
+    - SSH_USER
+    - SSH_PUBKEY_PATH
+  outputs:
+    - cloud-init templates for user-data and meta-data
+
+acceptance_tests:
+  - name: hostname-set
+    command: "make lab-ssh NODE=1 CMD='hostname'"
+    expected: "${LAB_NAME}-node1"
+  - name: ssh-key-login
+    command: "make lab-ssh NODE=1 CMD='id -u'"
+    expected: "exit code 0"
+  - name: cloud-init-complete
+    command: "make lab-ssh NODE=1 CMD='cloud-init status --wait'"
+    expected: "status: done"
+  - name: docker-installed
+    command: "make lab-ssh NODE=1 CMD='docker --version'"
+    expected: "exit code 0"
+  - name: docker-running
+    command: "make lab-ssh NODE=1 CMD='systemctl is-active docker'"
+    expected: "active"
+
+rollback:
+  - Destroy lab VMs via `make lab-destroy`
+
+security_considerations:
+  - No passwords; SSH keys only
+  - Disable root login where feasible
+  - Install only required packages
+
+artifacts_produced:
+  - Templates: infra/modules/swarm_lab/cloudinit/user-data.yaml.tftpl
+  - Templates: infra/modules/swarm_lab/cloudinit/meta-data.yaml.tftpl
+  - Skill: skills/cloudinit_templates/skill.md
+  - Runbook: docs/runbooks/opentofu-libvirt.md
+
+dependencies:
+  - libvirt-host-setup
+
+related_skills:
+  - cloudinit_templates
+
+related_docs:
+  runbooks:
+    - docs/runbooks/opentofu-libvirt.md
+  adrs: []
