@@ -40,6 +40,18 @@ variable "mgmt_network" {
   default     = "default"
 }
 
+variable "mgmt_network_cidr" {
+  type        = string
+  description = "Libvirt network CIDR for MGMT_MODE=user (empty to use existing network)"
+  default     = ""
+}
+
+variable "mgmt_ip_start" {
+  type        = number
+  description = "Starting host number for fixed mgmt IPs (MGMT_MODE=user)"
+  default     = 10
+}
+
 variable "swarm_bridge" {
   type        = string
   description = "Host bridge name for swarm NIC"

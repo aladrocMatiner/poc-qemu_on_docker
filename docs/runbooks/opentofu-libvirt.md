@@ -24,7 +24,7 @@ This writes `work/inventory.json`.
 
 ## Troubleshooting
 - If `virsh` cannot connect: verify `LIBVIRT_URI` and libvirtd service.
-- If IP discovery fails: check DHCP leases for the management network.
+- If IP discovery fails: check DHCP leases for the management network. For fixed IPs, set `MGMT_NETWORK_CIDR` and `MGMT_IP_START` in `.env`.
 - If QEMU reports `Permission denied` for disk images: AppArmor is likely
   blocking access. The lab domains inject a `seclabel` to disable AppArmor
   (`infra/modules/swarm_lab/domain-seclabel-none.xslt`).

@@ -56,12 +56,14 @@ while read -r node; do
   name=$(jq -r '.name' <<<"${node}")
   mgmt_mac=$(jq -r '.mgmt_mac' <<<"${node}")
   swarm_mac=$(jq -r '.swarm_mac' <<<"${node}")
+  mgmt_ip=$(jq -r '.mgmt_ip // empty' <<<"${node}")
 
-  mgmt_ip=""
-  if [[ "${mgmt_mode}" == "user" ]]; then
-    mgmt_ip=$(get_ip_from_leases "${mgmt_network}" "${mgmt_mac}" || true)
-  else
-    mgmt_ip=$(get_ip_from_leases "${mgmt_network}" "${mgmt_mac}" || true)
+  if [[ -z "${mgmt_ip}" ]]; then
+    if [[ "${mgmt_mode}" == "user" ]]; then
+      mgmt_ip=$(get_ip_from_leases "${mgmt_network}" "${mgmt_mac}" || true)
+    else
+      mgmt_ip=$(get_ip_from_leases "${mgmt_network}" "${mgmt_mac}" || true)
+    fi
   fi
 
   manual_var="NODE_MGMT_IP_NODE${index}"

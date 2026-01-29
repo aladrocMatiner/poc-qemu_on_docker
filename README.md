@@ -69,7 +69,7 @@ $ make doctor
 
 ## Management Modes
 
-- `MGMT_MODE=user` (default): uses libvirt NAT network and DHCP lease discovery.
+- `MGMT_MODE=user` (default): uses libvirt NAT network and DHCP lease discovery. If `MGMT_NETWORK_CIDR` is set, the lab creates the network and reserves fixed IPs starting at `MGMT_IP_START` (use a non-default `MGMT_NETWORK` name).
 - `MGMT_MODE=bridge`: attaches mgmt NIC to `MGMT_BRIDGE` (must exist).
 
 ## Docs

@@ -43,6 +43,13 @@ validate_network_env() {
     require_var MGMT_BRIDGE || return 1
     require_bridge "${MGMT_BRIDGE}" || return 1
   fi
+  if [[ "${mode}" == "user" && -n "${MGMT_NETWORK_CIDR:-}" ]]; then
+    local network_name=${MGMT_NETWORK:-default}
+    if [[ "${network_name}" == "default" ]]; then
+      err "MGMT_NETWORK_CIDR is set but MGMT_NETWORK=default. Use a lab-specific network name to avoid clobbering the default network."
+      return 1
+    fi
+  fi
 }
 
 node_name() {
