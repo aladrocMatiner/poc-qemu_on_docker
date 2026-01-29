@@ -1,0 +1,56 @@
+id: lab-snapshot-restore
+title: Lab snapshot and restore (placeholder)
+status: draft
+owner_agent: vmops
+priority: low
+
+problem_statement: |
+  Operators need a simple, best-effort way to snapshot and restore the lab
+  VMs during iterative testing or recovery. The Make targets provide a UX
+  surface, but the exact behavior depends on libvirt and storage backends.
+
+scope:
+  - Document expected snapshot/restore flow and requirements
+  - Capture known limitations and safety notes
+
+non_goals:
+  - Full backup/restore or cross-host migration
+  - Guaranteed consistency for running VMs
+
+constraints:
+  - Best-effort behavior depends on libvirt storage driver
+  - No destructive actions by default
+
+assumptions:
+  - Libvirt is installed and accessible
+  - Lab VMs are qcow2-backed
+
+interfaces:
+  inputs:
+    - NAME (snapshot name)
+  outputs:
+    - Libvirt domain snapshot state
+
+acceptance_tests:
+  - name: TBD
+    command: "TBD"
+    expected: "TBD"
+
+rollback:
+  - Use lab-restore with a known snapshot
+
+security_considerations:
+  - Avoid encoding secrets in snapshot names
+
+artifacts_produced:
+  - Placeholder spec only
+
+dependencies:
+  - libvirt-host-setup
+
+related_skills:
+  - vm_storage_qcow2_snapshots
+
+related_docs:
+  runbooks: []
+  adrs: []

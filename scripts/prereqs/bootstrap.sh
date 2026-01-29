@@ -335,21 +335,21 @@ verify_access() {
 print_summary() {
   printf "\n%s\n" "=== Bootstrap Summary ==="
   if [[ ${#INSTALLED_ITEMS[@]} -gt 0 ]]; then
-    printf "%s\n" "Installed:"; printf "- %s\n" "${INSTALLED_ITEMS[@]}"
+    printf "%s\n" "Installed:"; printf -- "- %s\n" "${INSTALLED_ITEMS[@]}"
   fi
   if [[ ${#SKIPPED_ITEMS[@]} -gt 0 ]]; then
-    printf "%s\n" "Skipped:"; printf "- %s\n" "${SKIPPED_ITEMS[@]}"
+    printf "%s\n" "Skipped:"; printf -- "- %s\n" "${SKIPPED_ITEMS[@]}"
   fi
   if [[ ${#WARNINGS[@]} -gt 0 ]]; then
-    printf "%s\n" "Warnings:"; printf "- %s\n" "${WARNINGS[@]}"
+    printf "%s\n" "Warnings:"; printf -- "- %s\n" "${WARNINGS[@]}"
   fi
   printf "\n%s\n" "Next steps:"
-  printf "- %s\n" "If groups changed, log out/in to apply docker/kvm access."
-  printf "- %s\n" "Run: make prereqs-check"
+  printf -- "- %s\n" "If groups changed, log out/in to apply docker/kvm access."
+  printf -- "- %s\n" "Run: make prereqs-check"
   printf "\n%s\n" "Quick verification:"
-  printf "- %s\n" "docker --version"
-  printf "- %s\n" "qemu-system-x86_64 --version"
-  printf "- %s\n" "[ -r /dev/kvm ] && [ -w /dev/kvm ]"
+  printf -- "- %s\n" "docker --version"
+  printf -- "- %s\n" "qemu-system-x86_64 --version"
+  printf -- "- %s\n" "[ -r /dev/kvm ] && [ -w /dev/kvm ]"
 }
 
 main() {

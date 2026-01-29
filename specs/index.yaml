@@ -109,6 +109,16 @@ specs:
     related_runbooks: []
     related_adrs: []
 
+  - id: lab-snapshot-restore
+    title: Lab snapshot and restore (placeholder)
+    owner_agent: vmops
+    status: draft
+    priority: low
+    dependencies: [libvirt-host-setup]
+    related_skills: [vm_storage_qcow2_snapshots]
+    related_runbooks: []
+    related_adrs: []
+
   - id: dhcp-reservations
     title: DHCP reservations by MAC
     owner_agent: netops
