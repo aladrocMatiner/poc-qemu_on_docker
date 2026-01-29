@@ -1,6 +1,6 @@
 ---
 - name: Check swarm state
-  ansible.builtin.command: docker info --format '{{.Swarm.LocalNodeState}}'
+  ansible.builtin.command: !unsafe docker info --format '{{.Swarm.LocalNodeState}}'
   register: swarm_state
   changed_when: false
 
