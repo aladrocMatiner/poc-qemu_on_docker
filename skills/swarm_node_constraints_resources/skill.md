@@ -47,6 +47,7 @@ $ docker service ps <stack>_vm-runner
 - Node labels
 - Placement constraints in stack files
 
-## Related skills / docs
-- `../swarm_stack_patterns/skill.md`
-- `../qemu_kvm_in_container/skill.md`
+## Related specs / docs
+- Spec ID: `swarm-node-constraints` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

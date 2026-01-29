@@ -1,9 +1,11 @@
 # File Map
 
-- `.codex/` — repo-wide guardrails, style, and definition-of-done rules for Swarm + QEMU/KVM PoC.
-- `agents/` — role-specific guidance for architecture, networking, VM operations, security, SRE, and docs.
-- `skills/` — step-by-step procedures for Swarm setup, networking, QEMU/KVM, DHCP, and operations.
-- `docs/` — user-facing documentation and project overview.
-- `docs/adr/` — architecture decision records (required for major design choices).
+- `.codex/` — guardrails, style, DoD, and OpenSpec workflow rules.
+- `specs/` — source-of-truth challenge specs and templates.
+- `specs/templates/` — templates for specs, ADRs, and runbooks.
+- `agents/` — role-specific responsibilities and review checklists.
+- `skills/` — how-to playbooks implementing specs.
+- `docs/` — project overview and operational documentation.
+- `docs/adr/` — architecture decision records (required for major decisions).
 - `docs/runbooks/` — operational runbooks (deploy, troubleshoot, recover).
-- `docs/diagrams/` — network and architecture diagrams with references from docs.
+- `docs/diagrams/` — network and architecture diagrams referenced by docs.

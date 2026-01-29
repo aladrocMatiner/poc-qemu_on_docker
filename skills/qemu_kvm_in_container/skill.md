@@ -72,7 +72,7 @@ services:
 - VM runner container image
 - Swarm service definition
 
-## Related skills / docs
-- `../qemu_tap_bridge_networking/skill.md`
-- `../security_hardening_vm_services/skill.md`
-- `../swarm_node_constraints_resources/skill.md`
+## Related specs / docs
+- Spec ID: `qemu-runner-container` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

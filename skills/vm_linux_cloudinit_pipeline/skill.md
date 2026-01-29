@@ -52,6 +52,7 @@ $ cloud-localds ${SEED_ISO} ${USER_DATA} ${META_DATA}
 - qcow2 overlay disk
 - cloud-init seed ISO
 
-## Related skills / docs
-- `../vm_storage_qcow2_snapshots/skill.md`
-- `../dhcp_dns_reservations/skill.md`
+## Related specs / docs
+- Spec ID: `vm-linux-cloudinit` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

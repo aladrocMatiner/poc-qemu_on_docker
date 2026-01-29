@@ -69,6 +69,7 @@ $ nmcli con add type ethernet ifname eth0 master br0
 ## Artifacts produced
 - Host bridge configuration files
 
-## Related skills / docs
-- `../qemu_tap_bridge_networking/skill.md`
-- `../dhcp_dns_reservations/skill.md`
+## Related specs / docs
+- Spec ID: `lan-bridge-br0` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

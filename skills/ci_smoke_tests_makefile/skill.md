@@ -54,6 +54,7 @@ $ make smoke
 - `Makefile` target or `scripts/smoke.sh`
 - Smoke test documentation
 
-## Related skills / docs
-- `../swarm_cluster_bootstrap/skill.md`
-- `../observability_logging_metrics/skill.md`
+## Related specs / docs
+- Spec ID: `ci-smoke-tests` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

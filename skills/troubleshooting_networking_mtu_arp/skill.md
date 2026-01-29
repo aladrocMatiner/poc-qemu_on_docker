@@ -62,6 +62,7 @@ $ ping -M do -s 1472 ${TARGET_IP}
 ## Artifacts produced
 - Troubleshooting notes and command outputs summary
 
-## Related skills / docs
-- `../host_bridge_vlan_setup/skill.md`
-- `../qemu_tap_bridge_networking/skill.md`
+## Related specs / docs
+- Spec ID: `troubleshooting-networking` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

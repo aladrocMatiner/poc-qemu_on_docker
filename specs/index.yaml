@@ -1,0 +1,170 @@
+specs:
+  - id: swarm-bootstrap
+    title: Swarm cluster bootstrap
+    owner_agent: sre
+    status: draft
+    priority: high
+    dependencies: []
+    related_skills: [swarm_cluster_bootstrap]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: swarm-stack-patterns
+    title: Swarm stack deployment patterns
+    owner_agent: architect
+    status: draft
+    priority: medium
+    dependencies: [swarm-bootstrap]
+    related_skills: [swarm_stack_patterns]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: swarm-overlay-ingress
+    title: Swarm ingress vs host publish guidance
+    owner_agent: architect
+    status: draft
+    priority: medium
+    dependencies: [swarm-bootstrap]
+    related_skills: [swarm_overlay_ingress]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: lan-bridge-br0
+    title: Host bridge br0 and VLAN setup
+    owner_agent: netops
+    status: draft
+    priority: high
+    dependencies: []
+    related_skills: [host_bridge_vlan_setup]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: lan-macvlan-ipvlan
+    title: LAN L2 macvlan/ipvlan networks
+    owner_agent: netops
+    status: draft
+    priority: medium
+    dependencies: [lan-bridge-br0]
+    related_skills: [lan_l2_macvlan_ipvlan]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: qemu-runner-container
+    title: QEMU/KVM VM runner container
+    owner_agent: vmops
+    status: draft
+    priority: high
+    dependencies: [swarm-bootstrap]
+    related_skills: [qemu_kvm_in_container]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: qemu-tap-bridge
+    title: TAP-to-br0 networking for VMs
+    owner_agent: vmops
+    status: draft
+    priority: high
+    dependencies: [lan-bridge-br0]
+    related_skills: [qemu_tap_bridge_networking]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: vm-linux-cloudinit
+    title: Linux cloud-init pipeline
+    owner_agent: vmops
+    status: draft
+    priority: medium
+    dependencies: [qemu-runner-container]
+    related_skills: [vm_linux_cloudinit_pipeline]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: vm-windows-unattended
+    title: Windows unattended install with virtio
+    owner_agent: vmops
+    status: draft
+    priority: medium
+    dependencies: [qemu-runner-container]
+    related_skills: [vm_windows_unattended_virtio]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: console-access
+    title: VM console access (VNC/SPICE/RDP)
+    owner_agent: secops
+    status: draft
+    priority: high
+    dependencies: [qemu-runner-container]
+    related_skills: [vm_console_access_vnc_spice_rdp]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: vm-storage-qcow2
+    title: qcow2 storage layout and snapshots
+    owner_agent: vmops
+    status: draft
+    priority: medium
+    dependencies: [qemu-runner-container]
+    related_skills: [vm_storage_qcow2_snapshots]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: dhcp-reservations
+    title: DHCP reservations by MAC
+    owner_agent: netops
+    status: draft
+    priority: high
+    dependencies: [lan-bridge-br0]
+    related_skills: [dhcp_dns_reservations]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: swarm-node-constraints
+    title: Swarm node constraints and resources
+    owner_agent: sre
+    status: draft
+    priority: medium
+    dependencies: [swarm-bootstrap]
+    related_skills: [swarm_node_constraints_resources]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: security-hardening-vm-services
+    title: VM runner security hardening
+    owner_agent: secops
+    status: draft
+    priority: high
+    dependencies: [qemu-runner-container]
+    related_skills: [security_hardening_vm_services]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: observability-baseline
+    title: Logging and metrics baseline
+    owner_agent: sre
+    status: draft
+    priority: medium
+    dependencies: [swarm-bootstrap]
+    related_skills: [observability_logging_metrics]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: troubleshooting-networking
+    title: Networking troubleshooting for MTU/ARP/DHCP
+    owner_agent: netops
+    status: draft
+    priority: low
+    dependencies: [lan-bridge-br0]
+    related_skills: [troubleshooting_networking_mtu_arp]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: ci-smoke-tests
+    title: CI smoke tests for Swarm + VMs
+    owner_agent: sre
+    status: draft
+    priority: low
+    dependencies: [swarm-bootstrap, qemu-runner-container]
+    related_skills: [ci_smoke_tests_makefile]
+    related_runbooks: []
+    related_adrs: []

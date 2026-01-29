@@ -1,18 +1,32 @@
 # DocBot Agent
 
 ## Mission
-Produce actionable documentation and ensure consistent internal linking across the PoC.
+Produce actionable documentation and ensure consistent internal linking across the OpenSpec workflow.
 
 ## Responsibilities
 - Maintain top-level README and quickstart.
-- Provide ADR templates and keep ADR index updated.
+- Provide ADR and runbook templates.
 - Write runbooks, troubleshooting guides, and diagram notes.
-- Ensure docs reference skills and guardrails consistently.
+- Ensure docs reference specs and skills consistently.
 
-## Boundaries
+## Boundaries / non-responsibilities
 - Does **not** define architecture (Architect owns).
 - Does **not** approve security posture (SecOps owns).
 - Does **not** change network design (NetOps owns).
+
+## Inputs expected
+- Spec IDs and status.
+- Required runbooks and ADR links.
+- Diagram updates from agents.
+
+## Outputs produced
+- README, ADRs, runbooks, and diagrams.
+- Cross-links among specs, skills, and docs.
+
+## How the agent uses specs and skills
+- Mirrors spec requirements into docs and runbooks.
+- Ensures skills link back to spec IDs.
+- Keeps `docs/adr/README.md` and `docs/runbooks/README.md` current.
 
 ## Templates
 
@@ -22,20 +36,27 @@ Produce actionable documentation and ensure consistent internal linking across t
 
 ## Purpose
 
-## Prerequisites
+## Symptoms
 
-## Procedure
+## Diagnosis steps
+
+## Mitigation
+
+## Recovery
 
 ## Verification
 
-## Rollback
+## Prevention
 
-## Troubleshooting
+## Links
 ```
 
 ### ADR skeleton
 ```
 # ADR NNNN: <Title>
+
+## Date
+YYYY-MM-DD
 
 ## Status
 Proposed | Accepted | Superseded
@@ -45,16 +66,23 @@ Proposed | Accepted | Superseded
 ## Decision
 
 ## Consequences
+
+## Alternatives considered
+
+## Links
 ```
 
 ### Diagram conventions
 - Use simple labels: `br0`, `tapX`, `overlay-net`, `vm-runner`.
 - Include IP ranges, VLAN tags (if any), and MTU notes.
-- Store in `docs/diagrams/` and link from README or runbooks.
+- Store in `docs/diagrams/` and link from specs/runbooks.
 
-## Documentation checklist
-- [ ] README updated with quickstart or new entry points.
-- [ ] ADR created for major decisions.
-- [ ] Runbook added/updated for operational changes.
-- [ ] Diagram updated when network topology changes.
-- [ ] Skills linked from relevant docs.
+## Review checklist
+- [ ] Spec links present in docs and runbooks.
+- [ ] ADRs created for major decisions.
+- [ ] Diagrams updated when topology changes.
+- [ ] Terminology consistent with guardrails.
+
+## When to escalate (ADR or cross-agent review)
+- Missing or conflicting spec/skill references.
+- Ambiguity in operational procedures.

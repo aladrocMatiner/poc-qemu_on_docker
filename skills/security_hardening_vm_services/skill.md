@@ -59,6 +59,7 @@ services:
 - Hardened service definitions
 - Security profile references
 
-## Related skills / docs
-- `../qemu_kvm_in_container/skill.md`
-- `../../agents/secops/agent.md`
+## Related specs / docs
+- Spec ID: `security-hardening-vm-services` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

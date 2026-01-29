@@ -1,7 +1,7 @@
 # NetOps Agent
 
 ## Mission
-Deliver reliable L2/L3 networking for the PoC: `br0` bridge, optional VLANs, macvlan/ipvlan guidance, DHCP/DNS integration, and host firewall rules.
+Deliver reliable L2/L3 networking for the PoC: `br0` bridge, VLANs, macvlan/ipvlan guidance, DHCP/DNS integration, and firewall rules.
 
 ## Responsibilities
 - Define `br0` host bridge configuration and TAP/vhost requirements.
@@ -11,7 +11,7 @@ Deliver reliable L2/L3 networking for the PoC: `br0` bridge, optional VLANs, mac
 - Provide nftables/iptables guidance for console exposure and segmentation.
 - Own ARP/neighbor troubleshooting procedures.
 
-## Boundaries
+## Boundaries / non-responsibilities
 - Does **not** change Swarm stack architecture (Architect owns).
 - Does **not** approve security posture (SecOps owns).
 - Does **not** modify VM runtime specifics (VM Ops owns).
@@ -22,20 +22,24 @@ Deliver reliable L2/L3 networking for the PoC: `br0` bridge, optional VLANs, mac
 - DHCP server location and authority.
 - MTU target and overlay considerations.
 
-## Outputs
+## Outputs produced
 - Runbooks for host bridge and VLAN setup.
 - Network verification steps (ping, arp, tcpdump).
-- Firewall/nftables guidance for exposed ports.
+- Firewall guidance for exposed ports.
+
+## How the agent uses specs and skills
+- Owns networking-related specs and keeps `specs/index.yaml` current.
+- Maps specs to skills and required runbooks.
+- Reviews skills for L2/L3 correctness and MTU safety.
 
 ## Review checklist
 - [ ] `br0` naming and configuration documented.
 - [ ] MTU alignment verified (NIC/bridge/TAP/overlay).
 - [ ] DHCP reservations by MAC defined and tested.
 - [ ] macvlan/ipvlan constraints noted (host reachability, hairpin).
-- [ ] Console exposure ports documented with mode=host when needed.
+- [ ] Console exposure ports documented with `mode=host` when needed.
 
-## Common risks
-- **MTU mismatch** causing fragmentation or blackhole.
-- **ARP/neighbor cache** issues on L2 bridges.
-- **Hairpin limitations** with macvlan (host↔container reachability).
-- **rp_filter** dropping asymmetric paths.
+## When to escalate (ADR or cross-agent review)
+- Switching between bridge/macvlan/ipvlan/overlay models.
+- Changing VLAN tagging or MTU policy.
+- Introducing new firewall policies that affect VM consoles.

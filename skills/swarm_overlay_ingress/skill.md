@@ -52,6 +52,7 @@ $ nc -zv <node-ip> 5901
 - Port allocation map
 - Service publish configuration
 
-## Related skills / docs
-- `../swarm_stack_patterns/skill.md`
-- `../vm_console_access_vnc_spice_rdp/skill.md`
+## Related specs / docs
+- Spec ID: `swarm-overlay-ingress` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

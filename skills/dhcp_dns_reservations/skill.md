@@ -54,6 +54,7 @@ $ grep 52:54:00:aa:bb:cc /var/lib/misc/dnsmasq.leases
 - DHCP reservation entries
 - DNS entries (optional)
 
-## Related skills / docs
-- `../qemu_tap_bridge_networking/skill.md`
-- `../lan_l2_macvlan_ipvlan/skill.md`
+## Related specs / docs
+- Spec ID: `dhcp-reservations` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

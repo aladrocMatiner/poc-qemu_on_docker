@@ -1,22 +1,20 @@
 # Definition of Done (DoD)
 
-## Universal DoD (any change/PR)
-- [ ] Requirements met; scope and non-goals respected.
+## Universal DoD (any spec/skill implementation)
 - [ ] Reproducible steps documented (host setup, Swarm labels, network).
-- [ ] Smoke tests updated and runnable on a fresh node.
-- [ ] Rollback notes included (how to stop services, remove volumes, revert configs).
-- [ ] Security review completed (caps, devices, secrets/configs, exposure).
-- [ ] Logging/metrics impact assessed and documented.
+- [ ] Smoke tests and acceptance checks documented and runnable.
+- [ ] Rollback steps documented.
+- [ ] Security review completed (caps, exposure, secrets).
+- [ ] Logging/metrics considerations noted.
+- [ ] Cross-links updated: spec ⇄ skill ⇄ runbook ⇄ ADR.
 - [ ] No secrets or ISOs committed.
-- [ ] ADR added/updated for major architectural decisions.
 
 ## Skill completion DoD
-- [ ] Skill steps are complete, ordered, and runnable.
-- [ ] Inputs/variables and prerequisites are explicit.
+- [ ] Skill steps complete, ordered, and actionable.
+- [ ] Inputs/variables and prerequisites explicit.
 - [ ] Security considerations and troubleshooting included.
-- [ ] Acceptance criteria are measurable.
-- [ ] Artifacts produced listed.
-- [ ] Related skills/docs linked.
+- [ ] Acceptance criteria measurable.
+- [ ] Related spec IDs listed from `specs/index.yaml`.
 
 ## PoC-specific checks
 - [ ] Swarm constraints/labels used for VM runner placement.

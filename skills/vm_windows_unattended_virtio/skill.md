@@ -57,6 +57,7 @@ $ qemu-system-x86_64 -enable-kvm -m 4096 -smp 2 \
 - qcow2 disk image
 - `autounattend.xml` (stored outside secrets)
 
-## Related skills / docs
-- `../vm_console_access_vnc_spice_rdp/skill.md`
-- `../dhcp_dns_reservations/skill.md`
+## Related specs / docs
+- Spec ID: `vm-windows-unattended` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

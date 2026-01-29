@@ -49,6 +49,7 @@ $ docker network create -d macvlan \
 ## Artifacts produced
 - Local macvlan/ipvlan networks per node
 
-## Related skills / docs
-- `../host_bridge_vlan_setup/skill.md`
-- `../dhcp_dns_reservations/skill.md`
+## Related specs / docs
+- Spec ID: `lan-macvlan-ipvlan` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

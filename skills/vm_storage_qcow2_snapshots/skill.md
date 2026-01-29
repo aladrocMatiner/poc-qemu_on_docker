@@ -53,6 +53,7 @@ $ qemu-img check ${INSTANCE_DISK}
 - qcow2 base and overlay images
 - Snapshot records
 
-## Related skills / docs
-- `../vm_linux_cloudinit_pipeline/skill.md`
-- `../vm_windows_unattended_virtio/skill.md`
+## Related specs / docs
+- Spec ID: `vm-storage-qcow2` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

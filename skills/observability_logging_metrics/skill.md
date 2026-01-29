@@ -52,6 +52,7 @@ $ curl http://<node-ip>:8080/metrics
 - Monitoring stack definition
 - Log volume mappings
 
-## Related skills / docs
-- `../swarm_stack_patterns/skill.md`
-- `../ci_smoke_tests_makefile/skill.md`
+## Related specs / docs
+- Spec ID: `observability-baseline` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

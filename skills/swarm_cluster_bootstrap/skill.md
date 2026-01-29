@@ -61,7 +61,7 @@ $ docker network create -d overlay --attachable ${OVERLAY_NET_NAME}
 - Node labels
 - Overlay network
 
-## Related skills / docs
-- `../swarm_stack_patterns/skill.md`
-- `../swarm_node_constraints_resources/skill.md`
-- `../swarm_overlay_ingress/skill.md`
+## Related specs / docs
+- Spec ID: `swarm-bootstrap` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

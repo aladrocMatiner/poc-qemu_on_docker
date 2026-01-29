@@ -54,6 +54,7 @@ $ docker service create --publish published=5901,target=5900,mode=host ...
 - Console port map
 - Service publish configuration
 
-## Related skills / docs
-- `../swarm_overlay_ingress/skill.md`
-- `../security_hardening_vm_services/skill.md`
+## Related specs / docs
+- Spec ID: `console-access` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

@@ -84,7 +84,7 @@ services:
 - Stack Compose file
 - Service placement rules
 
-## Related skills / docs
-- `../swarm_cluster_bootstrap/skill.md`
-- `../swarm_node_constraints_resources/skill.md`
-- `../security_hardening_vm_services/skill.md`
+## Related specs / docs
+- Spec ID: `swarm-stack-patterns` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

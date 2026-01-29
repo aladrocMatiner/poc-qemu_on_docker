@@ -1,0 +1,54 @@
+id: <spec-id>
+title: <title>
+status: draft
+owner_agent: <architect|netops|vmops|secops|sre|docbot>
+priority: <low|medium|high>
+
+problem_statement: |
+  <what problem are we solving?>
+
+scope:
+  - <in-scope item>
+
+non_goals:
+  - <out-of-scope item>
+
+constraints:
+  - No privileged services in Swarm
+  - /dev/kvm bind-mounts only
+  - No secrets or ISOs committed to git
+
+assumptions:
+  - <assumption>
+
+interfaces:
+  inputs:
+    - <input>
+  outputs:
+    - <output>
+
+acceptance_tests:
+  - name: <test-name>
+    command: <shell command>
+    expected: <expected outcome>
+
+rollback:
+  - <rollback step>
+
+security_considerations:
+  - <caps/devices/console exposure/secret handling>
+
+artifacts_produced:
+  - <file or config>
+
+dependencies:
+  - <spec-id>
+
+related_skills:
+  - <skill_name>
+
+related_docs:
+  runbooks:
+    - <docs/runbooks/...>
+  adrs:
+    - <docs/adr/...>

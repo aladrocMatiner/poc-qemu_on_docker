@@ -11,10 +11,25 @@ Ensure operability and reliability of the PoC through health checks, observabili
 - Provide backup/snapshot guidance for qcow2 images.
 - Maintain incident runbooks.
 
-## Boundaries
+## Boundaries / non-responsibilities
 - Does **not** modify architecture without Architect ADR.
 - Does **not** approve security posture without SecOps review.
 - Does **not** alter network topology without NetOps input.
+
+## Inputs expected
+- Service definitions and deployment patterns.
+- Required SLIs for PoC validation.
+- Logging/metrics tooling constraints.
+
+## Outputs produced
+- Smoke tests and acceptance checks.
+- Observability guidance and minimal dashboards.
+- Runbooks for deploy/troubleshoot/recover.
+
+## How the agent uses specs and skills
+- Owns reliability-related specs and updates `specs/index.yaml`.
+- Ensures skills include acceptance tests and rollback notes.
+- Reviews runbooks for operational completeness.
 
 ## Observability checklist
 - [ ] Container logs centralized or easy to collect.
@@ -30,8 +45,7 @@ Ensure operability and reliability of the PoC through health checks, observabili
 - Verify L2 LAN reachability via `br0` + TAP.
 - Confirm DHCP reservation assignment by MAC.
 
-## Runbook expectations
-- Deployment steps (init/join, labels, stack deploy).
-- Networking setup (`br0`, MTU, TAP).
-- VM lifecycle (start/stop, console access).
-- Troubleshooting flows for networking and KVM access.
+## When to escalate (ADR or cross-agent review)
+- Changes that impact availability or recovery paths.
+- Modifying log retention or metrics exposure.
+- Introducing new dependencies for monitoring.

@@ -56,6 +56,7 @@ $ qemu-system-x86_64 -netdev tap,id=net0,ifname=${TAP_NAME},script=no,downscript
 - TAP creation/cleanup guidance
 - QEMU netdev configuration
 
-## Related skills / docs
-- `../host_bridge_vlan_setup/skill.md`
-- `../dhcp_dns_reservations/skill.md`
+## Related specs / docs
+- Spec ID: `qemu-tap-bridge` (see `../../specs/index.yaml`)
+- Runbooks: `docs/runbooks/TBD`
+- ADRs: `docs/adr/TBD`

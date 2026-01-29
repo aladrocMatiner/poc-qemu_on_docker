@@ -1,52 +1,55 @@
 # Guardrails
 
 ## Scope
-- Build a **Docker Swarm PoC** where normal containers and **QEMU/KVM VM runner containers** coexist.
-- Provide **L2 LAN presence** for selected workloads via **host bridge `br0` + TAP/vhost**.
-- Use **DHCP reservations by MAC** for stable VM/container addresses.
-- Use **Swarm overlay** for internal service-to-service traffic.
+- PoC for **Docker Swarm** with normal containers plus **QEMU/KVM VM runners**.
+- L2 LAN presence for selected workloads via **host bridge `br0` + TAP/vhost**.
+- **DHCP reservations by MAC** for stable VM/container addressing.
+- **Overlay networks** for internal service-to-service traffic.
 
 ## Non-goals
-- No production-grade HA guarantees, billing, or multi-tenant isolation.
-- No vendor-specific network stack (e.g., NSX, Calico, Cilium).
-- No embedded secrets, certificates, or license keys.
+- Production-grade HA, multi-tenant isolation, or SLA guarantees.
+- Vendor-specific SDN or hyperconverged storage.
+- Secrets management beyond Swarm `secrets`/`configs`.
 
-## Safety principles
-- **Least privilege:** only required Linux capabilities; avoid `--privileged`.
-- **No destructive defaults:** never `rm -rf` host paths; avoid forced reformatting.
-- **No secrets in repo:** use Swarm `secrets`/`configs` or external secret stores.
+## Safety defaults
+- **No destructive actions by default** (no forced reformat, no host-wide wipes).
+- **No secrets in repo** (no credentials, tokens, license keys).
+- **Least privilege**: minimal caps, minimal devices, explicit mounts only.
 
 ## Swarm constraints
-- **No `--privileged` services.** Design with `/dev/kvm` bind-mounts and minimal caps.
-- Prefer **node labels/constraints** for VM runners and storage locality.
-- Publish VM consoles **`mode=host` only when needed** (VNC/SPICE/RDP) to avoid overlay pathing.
+- **No `--privileged`** in services.
+- **Use labels/constraints** to place VM runners (e.g., `vm-capable=true`).
+- **Publish `mode=host`** for VM consoles when required (VNC/SPICE/RDP).
 
 ## Networking guardrails
-- Host bridge **must be named `br0`** for L2 bridging to LAN.
-- **VLANs optional:** document tag ID and MTU impact if used.
-- **MTU:** align `br0`, TAP, and physical NIC MTU; note 1500 vs 9000 and overlay headroom.
-- **macvlan/ipvlan:** use only where L2 adjacency is required; note host↔container reachability constraints.
-- **Port conventions:** reserve ranges per service class (e.g., VM consoles 5900–5999, monitoring 9100/9200); document in runbooks.
+- Bridge name **must be `br0`** across nodes.
+- **VLAN optional**; document VLAN ID, trunk/access, and MTU impact.
+- **MTU** aligned across NIC ↔ `br0` ↔ TAP; document overlay headroom.
+- **macvlan/ipvlan** only when L2 adjacency is required; note host↔container limitations.
+- **Port conventions**: reserve ranges (e.g., consoles 5900–5999) and document.
 
 ## Storage guardrails
-- VM disks are **qcow2**; support snapshots where needed.
-- **Do not commit ISOs/virtio ISOs** to git; reference external paths.
-- Suggested host paths: `/var/lib/poc-qemu/{isos,images,instances,logs}`.
+- VM disks use **qcow2**; base images read-only; overlays per VM.
+- **Do not commit ISOs/virtio ISOs**; reference external paths.
+- Default host layout: `/var/lib/poc-qemu/{images,instances,isos,seeds,logs}`.
+- **Corruption avoidance**: no snapshot/compaction while VM is running; document safe shutdown steps.
 
 ## Security guardrails
-- **Minimal caps** (e.g., `CAP_NET_ADMIN` only where required for TAP).
-- **/dev/kvm** bind-mount with read/write; no other device passthrough by default.
-- Use **seccomp/apparmor** profiles where supported; document deviations.
-- Use Swarm **secrets/configs** for credentials; never in env files.
+- **Minimal caps**; add `CAP_NET_ADMIN` only if TAP created inside container.
+- **/dev/kvm** bind-mount required; no other device passthrough by default.
+- Note **seccomp/apparmor** profile usage and exceptions.
+- Use **Swarm secrets/configs**; never env vars or git for sensitive data.
 
-## Documentation rules
-- **ADR required** for major architecture decisions (networking mode, DHCP design, storage layout, security posture).
+## Documentation guardrails
+- **ADR required** for major architectural decisions.
+- **Runbook required** for operational changes (deploy, rollback, recovery).
 
 ## Pre-merge checklist
 - [ ] No secrets or ISOs added to repo.
-- [ ] Least-privilege caps reviewed for new services.
+- [ ] Least-privilege caps and devices reviewed.
 - [ ] Swarm constraints/labels documented and applied.
-- [ ] `br0`/TAP/MTU notes updated if networking changes.
-- [ ] Storage layout and paths documented for any VM changes.
+- [ ] `br0`/TAP/MTU notes updated for network changes.
+- [ ] Storage layout and corruption-avoidance notes updated.
 - [ ] ADR added/updated for major decisions.
+- [ ] Runbook added/updated for operational changes.
 - [ ] Smoke tests updated or documented.

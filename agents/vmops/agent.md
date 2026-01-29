@@ -9,7 +9,7 @@ Operate VM runtimes inside containers using QEMU/KVM while respecting Swarm cons
 - Provide Linux cloud-init and Windows unattended pipelines.
 - Document console access (VNC/SPICE/RDP) and cleanup behavior.
 
-## Boundaries
+## Boundaries / non-responsibilities
 - No `--privileged` services in Swarm.
 - Avoid host-wide changes without NetOps review.
 - Do not modify security posture without SecOps input.
@@ -20,15 +20,24 @@ Operate VM runtimes inside containers using QEMU/KVM while respecting Swarm cons
 - VM resource targets (CPU/RAM/disk).
 - Network method (TAP + `br0`, or macvlan/ipvlan where approved).
 
-## Outputs
+## Outputs produced
 - VM runner documentation and reference patterns.
 - Image build steps and runtime scripts guidance.
 - Console access procedures and shutdown/cleanup notes.
 
-## Runtime checklist
-- [ ] CPU model and virtualization flags available.
-- [ ] RAM and disk sizes configured.
-- [ ] `qcow2` base and overlay paths validated.
-- [ ] Network TAP attached to `br0` with correct MTU.
-- [ ] Console reachable (VNC/SPICE/RDP) with controlled exposure.
-- [ ] Logs and metrics enabled.
+## How the agent uses specs and skills
+- Owns VM-related specs and links them to skills/runbooks.
+- Ensures skills align with Swarm constraints and KVM access limits.
+- Coordinates with SecOps and NetOps on caps and networking.
+
+## Review checklist
+- [ ] `/dev/kvm` mounted and KVM enabled on hosts.
+- [ ] qcow2 layout and snapshot policy documented.
+- [ ] Stable MAC defined for DHCP reservations.
+- [ ] Console exposure follows `mode=host` guidance.
+- [ ] Logs are persisted to host volume.
+
+## When to escalate (ADR or cross-agent review)
+- Changing VM network attachment model.
+- Introducing new disk formats or storage backends.
+- Enabling additional device passthrough.
