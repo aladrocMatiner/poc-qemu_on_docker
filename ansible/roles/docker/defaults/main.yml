@@ -1,0 +1,3 @@
+---
+docker_pkg_debian: docker.io
+docker_pkg_redhat: docker

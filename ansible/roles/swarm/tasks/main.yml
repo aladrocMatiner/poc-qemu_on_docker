@@ -1,0 +1,27 @@
+---
+- name: Check swarm state
+  ansible.builtin.command: docker info --format '{{.Swarm.LocalNodeState}}'
+  register: swarm_state
+  changed_when: false
+
+- name: Init swarm on first manager
+  ansible.builtin.shell: |
+    if [ -n "{{ swarm_advertise_addr }}" ]; then
+      docker swarm init --advertise-addr {{ swarm_advertise_addr }}
+    else
+      docker swarm init
+    fi
+  when: inventory_hostname == groups['swarm_managers'][0] and swarm_state.stdout != 'active'
+
+- name: Get worker join token
+  ansible.builtin.command: docker swarm join-token -q worker
+  register: worker_token
+  changed_when: false
+  run_once: true
+  delegate_to: "{{ groups['swarm_managers'][0] }}"
+
+- name: Join workers
+  ansible.builtin.command: >
+    docker swarm join --token {{ hostvars[groups['swarm_managers'][0]].worker_token.stdout }}
+    {{ hostvars[groups['swarm_managers'][0]].ansible_host | default(groups['swarm_managers'][0]) }}:2377
+  when: inventory_hostname in groups['swarm_workers'] and swarm_state.stdout != 'active'

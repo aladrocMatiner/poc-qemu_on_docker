@@ -1,0 +1,24 @@
+---
+- name: Verify cluster state
+  hosts: swarm_all
+  become: true
+  tasks:
+    - name: Docker active
+      command: systemctl is-active docker
+      register: docker_active
+      changed_when: false
+
+    - name: Docker version
+      command: docker --version
+      register: docker_version
+      changed_when: false
+
+- name: Verify Swarm on manager
+  hosts: swarm_managers
+  become: true
+  tasks:
+    - name: Swarm nodes list
+      command: docker node ls
+      register: swarm_nodes
+      changed_when: false
+      run_once: true

@@ -1,0 +1,85 @@
+id: ansible-vm-configuration
+title: Configure lab VMs with Ansible
+status: draft
+owner_agent: ansibleops
+priority: high
+
+problem_statement: |
+  Cloud-init should remain minimal. Full configuration (packages, Docker, Swarm)
+  must be applied via Ansible using a generated inventory.
+
+scope:
+  - Generate Ansible inventory from work/inventory.json
+  - Provide baseline, Docker, Swarm, and verify playbooks
+  - Ensure idempotent runs and clear Make targets
+
+non_goals:
+  - Production hardening policies
+  - Secrets management beyond SSH keys
+
+constraints:
+  - No passwords committed to git
+  - Inventory must use key-based SSH
+
+assumptions:
+  - Inventory contract is stable
+  - SSH access works to all nodes
+
+interfaces:
+  inputs:
+    - work/inventory.json
+    - ANSIBLE_* env vars
+  outputs:
+    - ansible/inventories/generated/inventory.ini
+
+acceptance_tests:
+  - name: lab-up
+    command: "make lab-up"
+    expected: "exit code 0"
+  - name: lab-status
+    command: "make lab-status"
+    expected: "inventory.json present"
+  - name: ansible-inventory
+    command: "make ansible-inventory"
+    expected: "inventory.ini created"
+  - name: ansible-ping
+    command: "make ansible-ping"
+    expected: "all hosts reachable"
+  - name: ansible-baseline
+    command: "make ansible-baseline"
+    expected: "exit code 0"
+  - name: ansible-docker
+    command: "make ansible-docker"
+    expected: "docker installed"
+  - name: ansible-swarm
+    command: "make ansible-swarm"
+    expected: "swarm formed"
+  - name: ansible-verify
+    command: "make ansible-verify"
+    expected: "exit code 0"
+
+rollback:
+  - make lab-destroy
+  - remove ansible/inventories/generated
+
+security_considerations:
+  - SSH keys only; no passwords
+  - least privilege and explicit become
+
+artifacts_produced:
+  - ansible/ playbooks and roles
+  - docs/runbooks/ansible-operations.md
+
+dependencies:
+  - tofu-inventory-access
+  - cloudinit-baseline
+
+related_skills:
+  - ansible_basics
+  - ansible_inventory_from_tofu
+  - ansible_swarm_configuration
+
+related_docs:
+  runbooks:
+    - docs/runbooks/ansible-operations.md
+  adrs: []

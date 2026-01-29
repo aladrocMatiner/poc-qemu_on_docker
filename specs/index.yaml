@@ -149,6 +149,16 @@ specs:
     related_runbooks: []
     related_adrs: []
 
+  - id: phase1-smoke-tests
+    title: Phase 1 smoke test suite
+    owner_agent: platformqa
+    status: draft
+    priority: medium
+    dependencies: [libvirt-host-setup, cloudinit-baseline, tofu-inventory-access, ansible-vm-configuration]
+    related_skills: [ci_smoke_tests_makefile]
+    related_runbooks: [docs/runbooks/smoke-tests.md]
+    related_adrs: []
+
   - id: troubleshooting-networking
     title: Networking troubleshooting for MTU/ARP/DHCP
     owner_agent: netops
@@ -167,6 +177,56 @@ specs:
     dependencies: [swarm-bootstrap, qemu-runner-container]
     related_skills: [ci_smoke_tests_makefile]
     related_runbooks: []
+    related_adrs: []
+
+  - id: inventory-contract
+    title: Inventory schema contract
+    owner_agent: platformqa
+    status: draft
+    priority: high
+    dependencies: [tofu-inventory-access]
+    related_skills: [tofu_inventory_and_access]
+    related_runbooks: [docs/inventory-schema.md]
+    related_adrs: [docs/adr/0002-inventory-contract.md]
+
+  - id: host-network-setup
+    title: Host bridge setup helper (opt-in)
+    owner_agent: netops
+    status: draft
+    priority: medium
+    dependencies: [libvirt-host-setup]
+    related_skills: [host_network_setup]
+    related_runbooks: [docs/runbooks/network-modes.md]
+    related_adrs: []
+
+  - id: failure-artifact-collection
+    title: Failure artifact collection
+    owner_agent: platformqa
+    status: draft
+    priority: medium
+    dependencies: [inventory-contract]
+    related_skills: [troubleshooting_networking_mtu_arp]
+    related_runbooks: [docs/runbooks/collect-logs.md]
+    related_adrs: []
+
+  - id: windows-vm-baseline
+    title: Windows VM baseline (placeholder)
+    owner_agent: vmops
+    status: draft
+    priority: low
+    dependencies: []
+    related_skills: [vm_windows_unattended_virtio]
+    related_runbooks: []
+    related_adrs: []
+
+  - id: ansible-vm-configuration
+    title: Configure lab VMs with Ansible
+    owner_agent: ansibleops
+    status: draft
+    priority: high
+    dependencies: [tofu-inventory-access, cloudinit-baseline]
+    related_skills: [ansible_basics, ansible_inventory_from_tofu, ansible_swarm_configuration]
+    related_runbooks: [docs/runbooks/ansible-operations.md]
     related_adrs: []
 
   - id: libvirt-host-setup

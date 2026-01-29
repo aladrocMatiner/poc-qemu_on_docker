@@ -1,0 +1,6 @@
+---
+- name: Baseline configuration
+  hosts: swarm_all
+  become: true
+  roles:
+    - common

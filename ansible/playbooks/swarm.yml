@@ -1,0 +1,6 @@
+---
+- name: Swarm configuration
+  hosts: swarm_all
+  become: true
+  roles:
+    - swarm

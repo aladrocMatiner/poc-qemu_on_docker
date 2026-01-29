@@ -1,0 +1,16 @@
+---
+common_packages_debian:
+  - curl
+  - ca-certificates
+  - jq
+  - iproute2
+  - rsync
+
+common_packages_redhat:
+  - curl
+  - ca-certificates
+  - jq
+  - iproute
+  - rsync
+
+common_timesync_package: chrony

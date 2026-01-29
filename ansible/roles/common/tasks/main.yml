@@ -1,0 +1,18 @@
+---
+- name: Set hostname
+  ansible.builtin.hostname:
+    name: "{{ inventory_hostname }}"
+
+- name: Select package list
+  ansible.builtin.set_fact:
+    common_packages: "{{ common_packages_debian if ansible_facts.os_family == 'Debian' else common_packages_redhat }}"
+
+- name: Install baseline packages
+  ansible.builtin.package:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: Ensure time sync package
+  ansible.builtin.package:
+    name: "{{ common_timesync_package }}"
+    state: present

@@ -1,0 +1,6 @@
+---
+- name: Docker configuration
+  hosts: swarm_all
+  become: true
+  roles:
+    - docker
