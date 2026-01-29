@@ -49,6 +49,9 @@ resource "libvirt_domain" "node" {
   name   = "${var.lab_name}-node${count.index + 1}"
   vcpu   = var.vm_cpu
   memory = var.vm_ram_mb
+  xml {
+    xslt = file("${path.module}/domain-seclabel-none.xslt")
+  }
 
   disk {
     volume_id = libvirt_volume.disk[count.index].id

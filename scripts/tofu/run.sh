@@ -16,6 +16,18 @@ WORKDIR=${WORKDIR:-work}
 DOWNLOADS_DIR=${DOWNLOADS_DIR:-work/downloads}
 POOL_PATH=${POOL_PATH:-${WORKDIR}/libvirt-pool}
 
+abs_path() {
+  local path=$1
+  if [[ "${path}" = /* ]]; then
+    printf "%s" "${path}"
+  else
+    printf "%s" "$(realpath -m "${ROOT_DIR}/${path}")"
+  fi
+}
+
+DOWNLOADS_DIR=$(abs_path "${DOWNLOADS_DIR}")
+POOL_PATH=$(abs_path "${POOL_PATH}")
+
 cd "${ROOT_DIR}"
 mkdir -p "${TOFU_STATE_DIR}"
 export TF_DATA_DIR="${TOFU_STATE_DIR}"
