@@ -7,6 +7,9 @@ BOOTSTRAP_INSTALL_DOCKER=${BOOTSTRAP_INSTALL_DOCKER:-1}
 BOOTSTRAP_INSTALL_QEMU=${BOOTSTRAP_INSTALL_QEMU:-1}
 BOOTSTRAP_INSTALL_CLOUDTOOLS=${BOOTSTRAP_INSTALL_CLOUDTOOLS:-1}
 BOOTSTRAP_INSTALL_NETTOOLS=${BOOTSTRAP_INSTALL_NETTOOLS:-1}
+BOOTSTRAP_INSTALL_TOFU=${BOOTSTRAP_INSTALL_TOFU:-1}
+BOOTSTRAP_INSTALL_LIBVIRT=${BOOTSTRAP_INSTALL_LIBVIRT:-1}
+BOOTSTRAP_INSTALL_ANSIBLE=${BOOTSTRAP_INSTALL_ANSIBLE:-1}
 
 OS_FAMILY=""
 OS_ID=""
@@ -218,9 +221,71 @@ ensure_docker() {
   INSTALLED_ITEMS+=("docker engine")
 }
 
+ensure_tofu_repo_debian() {
+  ${SUDO} install -m 0755 -d /etc/apt/keyrings
+  curl -fsSL https://get.opentofu.org/opentofu.gpg | ${SUDO} tee /etc/apt/keyrings/opentofu.gpg >/dev/null
+  curl -fsSL https://packages.opentofu.org/opentofu/tofu/gpgkey | ${SUDO} gpg --no-tty --batch --dearmor -o /etc/apt/keyrings/opentofu-repo.gpg >/dev/null
+  ${SUDO} chmod a+r /etc/apt/keyrings/opentofu.gpg /etc/apt/keyrings/opentofu-repo.gpg
+  printf "deb [signed-by=/etc/apt/keyrings/opentofu.gpg,/etc/apt/keyrings/opentofu-repo.gpg] https://packages.opentofu.org/opentofu/tofu/any/ any main\n" | \
+    ${SUDO} tee /etc/apt/sources.list.d/opentofu.list >/dev/null
+  ${SUDO} apt-get update -y
+}
+
+ensure_tofu_repo_rhel() {
+  ${SUDO} tee /etc/yum.repos.d/opentofu.repo >/dev/null <<'REPO'
+[opentofu]
+name=opentofu
+baseurl=https://packages.opentofu.org/opentofu/tofu/rpm_any/rpm_any/$basearch
+repo_gpgcheck=0
+gpgcheck=1
+enabled=1
+gpgkey=https://get.opentofu.org/opentofu.gpg
+       https://packages.opentofu.org/opentofu/tofu/gpgkey
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+[opentofu-source]
+name=opentofu-source
+baseurl=https://packages.opentofu.org/opentofu/tofu/rpm_any/rpm_any/SRPMS
+repo_gpgcheck=0
+gpgcheck=1
+enabled=1
+gpgkey=https://get.opentofu.org/opentofu.gpg
+       https://packages.opentofu.org/opentofu/tofu/gpgkey
+sslverify=1
+sslcacert=/etc/pki/tls/certs/ca-bundle.crt
+metadata_expire=300
+REPO
+}
+
+ensure_tofu() {
+  if has_cmd tofu; then
+    SKIPPED_ITEMS+=("tofu (already installed)")
+    return 0
+  fi
+  if [[ "${BOOTSTRAP_INSTALL_TOFU}" != "1" ]]; then
+    SKIPPED_ITEMS+=("tofu (BOOTSTRAP_INSTALL_TOFU=0)")
+    return 0
+  fi
+
+  if [[ "${OS_FAMILY}" == "debian" ]]; then
+    install_packages_apt ca-certificates curl gnupg
+    ensure_tofu_repo_debian
+    install_packages_apt tofu
+  else
+    if [[ "${OS_ID}" == "fedora" ]]; then
+      install_packages_dnf opentofu
+    else
+      ensure_tofu_repo_rhel
+      install_packages_dnf tofu
+    fi
+  fi
+  INSTALLED_ITEMS+=("tofu")
+}
+
 install_tooling() {
   if [[ "${OS_FAMILY}" == "debian" ]]; then
-    install_packages_apt make git curl wget jq openssh-client
+    install_packages_apt make git curl wget jq openssh-client rsync python3 python3-venv python3-pip
     if [[ "${BOOTSTRAP_INSTALL_NETTOOLS}" == "1" ]]; then
       install_packages_apt iproute2 bridge-utils iptables nftables
     fi
@@ -230,8 +295,14 @@ install_tooling() {
     if [[ "${BOOTSTRAP_INSTALL_CLOUDTOOLS}" == "1" ]]; then
       install_packages_apt cloud-image-utils || install_packages_apt genisoimage xorriso
     fi
+    if [[ "${BOOTSTRAP_INSTALL_LIBVIRT}" == "1" ]]; then
+      install_packages_apt libvirt-daemon-system libvirt-clients virtinst qemu-kvm
+    fi
+    if [[ "${BOOTSTRAP_INSTALL_ANSIBLE}" == "1" ]]; then
+      install_packages_apt ansible
+    fi
   else
-    install_packages_dnf make git curl wget jq openssh-clients
+    install_packages_dnf make git curl wget jq openssh-clients rsync python3 python3-pip
     if [[ "${BOOTSTRAP_INSTALL_NETTOOLS}" == "1" ]]; then
       install_packages_dnf iproute bridge-utils iptables nftables
     fi
@@ -240,6 +311,12 @@ install_tooling() {
     fi
     if [[ "${BOOTSTRAP_INSTALL_CLOUDTOOLS}" == "1" ]]; then
       install_packages_dnf cloud-utils genisoimage xorriso
+    fi
+    if [[ "${BOOTSTRAP_INSTALL_LIBVIRT}" == "1" ]]; then
+      install_packages_dnf libvirt libvirt-daemon libvirt-client virt-install
+    fi
+    if [[ "${BOOTSTRAP_INSTALL_ANSIBLE}" == "1" ]]; then
+      install_packages_dnf ansible-core
     fi
   fi
 }
@@ -283,9 +360,18 @@ main() {
   confirm_or_exit
 
   install_tooling
+  ensure_tofu
   ensure_docker
   ensure_kvm_modules
   verify_access
+
+  if [[ "${BOOTSTRAP_INSTALL_LIBVIRT}" == "1" ]]; then
+    if command -v systemctl >/dev/null 2>&1; then
+      ${SUDO} systemctl enable --now libvirtd || ${SUDO} systemctl enable --now libvirt-daemon || true
+    fi
+    ensure_group_membership libvirt "${USER}"
+    ensure_group_membership kvm "${USER}"
+  fi
 
   print_summary
 }

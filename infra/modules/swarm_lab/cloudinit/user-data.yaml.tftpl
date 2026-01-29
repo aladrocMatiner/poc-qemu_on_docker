@@ -1,0 +1,13 @@
+#cloud-config
+preserve_hostname: false
+hostname: ${hostname}
+ssh_pwauth: false
+users:
+  - name: ${ssh_user}
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ssh_pubkey}
+
+package_update: false
+package_upgrade: false
