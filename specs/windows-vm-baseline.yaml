@@ -1,0 +1,52 @@
+id: windows-vm-baseline
+title: Windows VM baseline (placeholder)
+status: draft
+owner_agent: vmops
+priority: low
+
+problem_statement: |
+  Windows VMs require external ISOs and virtio drivers that are not stored in git.
+  We need a placeholder spec that documents required inputs and future tests.
+
+scope:
+  - Document required Windows ISO and virtio ISO paths
+  - Define how external artifacts are referenced via .env
+
+non_goals:
+  - Implement Windows provisioning now
+
+constraints:
+  - Do not commit ISOs or drivers
+
+assumptions:
+  - External artifacts will be provided by the operator
+
+interfaces:
+  inputs:
+    - WIN_ISO_PATH
+    - VIRTIO_ISO_PATH
+  outputs:
+    - Documentation only
+
+acceptance_tests:
+  - name: TBD
+    command: "TBD"
+    expected: "TBD"
+
+rollback:
+  - None (placeholder spec)
+
+security_considerations:
+  - Do not store product keys in repo
+
+artifacts_produced:
+  - Placeholder spec only
+
+dependencies: []
+
+related_skills:
+  - vm_windows_unattended_virtio
+
+related_docs:
+  runbooks: []
+  adrs: []

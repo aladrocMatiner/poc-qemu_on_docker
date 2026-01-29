@@ -1,0 +1,54 @@
+id: failure-artifact-collection
+title: Failure artifact collection
+status: draft
+owner_agent: platformqa
+priority: medium
+
+problem_statement: |
+  When lab steps fail, operators need a consistent way to collect diagnostics
+  without manual, error-prone steps.
+
+scope:
+  - Collect inventory, tofu outputs, and libvirt diagnostics
+  - Best-effort remote log collection
+
+non_goals:
+  - Deep log analysis or automated remediation
+
+constraints:
+  - Best-effort only; no destructive actions
+
+assumptions:
+  - SSH access may or may not be available
+
+interfaces:
+  inputs:
+    - work/inventory.json
+  outputs:
+    - work/artifacts/<timestamp>.tar.gz
+
+acceptance_tests:
+  - name: collect-logs
+    command: "make collect-logs"
+    expected: "archive created"
+
+rollback:
+  - remove work/artifacts/*
+
+security_considerations:
+  - Do not include secrets or private keys
+
+artifacts_produced:
+  - scripts/diag/collect_logs.sh
+  - docs/runbooks/collect-logs.md
+
+dependencies:
+  - inventory-contract
+
+related_skills:
+  - troubleshooting_networking_mtu_arp
+
+related_docs:
+  runbooks:
+    - docs/runbooks/collect-logs.md
+  adrs: []

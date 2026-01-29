@@ -1,0 +1,60 @@
+id: host-network-setup
+title: Host bridge setup helper (opt-in)
+status: draft
+owner_agent: netops
+priority: medium
+
+problem_statement: |
+  Operators sometimes need a simple, explicit helper to create host bridges
+  for SWARM_BRIDGE and MGMT_BRIDGE without destructive defaults.
+
+scope:
+  - Provide an opt-in script to create missing bridges
+  - Document rollback steps
+
+non_goals:
+  - Automatic bridge creation without confirmation
+  - Reconfiguring host IPs
+
+constraints:
+  - Must require explicit confirmation (HOST_NETWORK_ASSUME_YES=1)
+  - No destructive actions by default
+
+assumptions:
+  - iproute2 is available
+
+interfaces:
+  inputs:
+    - SWARM_BRIDGE
+    - MGMT_BRIDGE
+  outputs:
+    - Host bridges created if missing
+
+acceptance_tests:
+  - name: require-confirmation
+    command: "HOST_NETWORK_ASSUME_YES=0 make host-network-setup"
+    expected: "refuses to run"
+  - name: create-bridges
+    command: "HOST_NETWORK_ASSUME_YES=1 make host-network-setup"
+    expected: "bridges exist"
+
+rollback:
+  - Document commands to remove created bridges
+
+security_considerations:
+  - Bridge creation affects host networking; use least privilege
+
+artifacts_produced:
+  - scripts/host/network_setup.sh
+  - skills/host_network_setup/skill.md
+
+dependencies:
+  - libvirt-host-setup
+
+related_skills:
+  - host_network_setup
+
+related_docs:
+  runbooks:
+    - docs/runbooks/network-modes.md
+  adrs: []

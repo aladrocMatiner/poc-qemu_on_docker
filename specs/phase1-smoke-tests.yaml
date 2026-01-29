@@ -1,0 +1,66 @@
+id: phase1-smoke-tests
+title: Phase 1 smoke test suite
+status: draft
+owner_agent: platformqa
+priority: medium
+
+problem_statement: |
+  Phase 1 needs a canonical smoke-test sequence to validate provisioning,
+  configuration, and basic Swarm health across MGMT_MODE variants.
+
+scope:
+  - Define a minimal test matrix (MGMT_MODE=user required; bridge optional)
+  - Provide end-to-end Make-driven smoke sequence
+  - Provide idempotency re-run checks
+
+non_goals:
+  - Full integration or performance testing
+  - Running libvirt tests in CI
+
+constraints:
+  - Tests must be non-interactive
+  - No secrets in test output
+
+assumptions:
+  - Lab can be provisioned locally
+  - Inventory contract is stable
+
+interfaces:
+  inputs:
+    - Make targets
+    - work/inventory.json
+  outputs:
+    - Smoke test results and logs
+
+acceptance_tests:
+  - name: happy-path-smoke
+    command: "make smoke"
+    expected: "exit code 0"
+  - name: idempotent-smoke
+    command: "make smoke-idempotent"
+    expected: "exit code 0"
+
+rollback:
+  - make lab-destroy
+  - remove work/inventory.json
+
+security_considerations:
+  - No plaintext secrets
+  - Avoid wide-open ports
+
+artifacts_produced:
+  - Runbook: docs/runbooks/smoke-tests.md
+
+dependencies:
+  - libvirt-host-setup
+  - cloudinit-baseline
+  - tofu-inventory-access
+  - ansible-vm-configuration
+
+related_skills:
+  - ci_smoke_tests_makefile
+
+related_docs:
+  runbooks:
+    - docs/runbooks/smoke-tests.md
+  adrs: []

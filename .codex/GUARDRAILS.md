@@ -40,6 +40,11 @@
 - Note **seccomp/apparmor** profile usage and exceptions.
 - Use **Swarm secrets/configs**; never env vars or git for sensitive data.
 
+## Secrets handling
+- Do not commit secrets, credentials, or private keys.
+- Ignore `secrets/` and `*.key` in git.
+- Prefer Swarm `secrets`/`configs` or external secret stores.
+
 ## Documentation guardrails
 - **ADR required** for major architectural decisions.
 - **Runbook required** for operational changes (deploy, rollback, recovery).

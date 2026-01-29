@@ -1,0 +1,51 @@
+id: phase2-qemu-in-container
+title: Phase 2 QEMU-in-container (placeholder)
+status: draft
+owner_agent: vmops
+priority: low
+
+problem_statement: |
+  Future phase will run QEMU/KVM inside containers while respecting Swarm
+  constraints (no privileged).
+
+scope:
+  - Define planned approach and constraints
+
+non_goals:
+  - Implementation in Phase 1
+
+constraints:
+  - No privileged services in Swarm
+  - /dev/kvm bind-mounts only
+
+assumptions:
+  - Swarm cluster available
+
+interfaces:
+  inputs:
+    - TBD
+  outputs:
+    - TBD
+
+acceptance_tests:
+  - name: TBD
+    command: "TBD"
+    expected: "TBD"
+
+rollback:
+  - TBD
+
+security_considerations:
+  - Least privilege caps only
+
+artifacts_produced:
+  - Placeholder spec only
+
+dependencies: []
+
+related_skills:
+  - qemu_kvm_in_container
+
+related_docs:
+  runbooks: []
+  adrs: []
