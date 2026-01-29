@@ -44,13 +44,13 @@ $ make lab-status
 5. Configure with Ansible:
 
 ```bash
-$ make ansible-bootstrap
-$ make ansible-inventory
-$ make ansible-ping
-$ make ansible-baseline
-$ make ansible-docker
-$ make ansible-swarm
-$ make ansible-verify
+$ make ansible-bootstrap  # install required Ansible collections
+$ make ansible-inventory  # generate inventory.ini from lab outputs
+$ make ansible-ping       # verify SSH connectivity to all nodes
+$ make ansible-baseline   # apply baseline OS configuration
+$ make ansible-docker     # install and enable Docker
+$ make ansible-swarm      # initialize/join Docker Swarm
+$ make ansible-verify     # verify Docker + Swarm state
 ```
 
 6. Optional smoke tests:

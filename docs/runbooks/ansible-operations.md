@@ -6,16 +6,16 @@ Configure lab VMs using Ansible playbooks and generated inventory.
 ## Inventory generation
 ```bash
 $ make lab-status
-$ make ansible-inventory
+$ make ansible-inventory  # generate inventory.ini from lab outputs
 ```
 
 ## Run playbooks
 ```bash
-$ make ansible-ping
-$ make ansible-baseline
-$ make ansible-docker
-$ make ansible-swarm
-$ make ansible-verify
+$ make ansible-ping       # verify SSH connectivity to all nodes
+$ make ansible-baseline   # apply baseline OS configuration
+$ make ansible-docker     # install and enable Docker
+$ make ansible-swarm      # initialize/join Docker Swarm
+$ make ansible-verify     # verify Docker + Swarm state
 ```
 
 ## Common failures
