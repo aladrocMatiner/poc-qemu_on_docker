@@ -10,12 +10,17 @@ ROOT_DIR=$(cd "${SCRIPT_DIR}/../.." && pwd)
 load_env
 
 ANSIBLE_INVENTORY=${ANSIBLE_INVENTORY:-ansible/inventories/generated/inventory.ini}
+ANSIBLE_CFG=${ANSIBLE_CFG:-ansible/ansible.cfg}
 ANSIBLE_SSH_USER=${ANSIBLE_SSH_USER:-${SSH_USER:-ubuntu}}
 ANSIBLE_SSH_PRIVATE_KEY=${ANSIBLE_SSH_PRIVATE_KEY:-$HOME/.ssh/id_ed25519}
 
 if [[ ! -f "${ANSIBLE_INVENTORY}" ]]; then
   err "Missing inventory: ${ANSIBLE_INVENTORY}. Run: make ansible-inventory"
   exit 1
+fi
+
+if [[ -f "${ANSIBLE_CFG}" ]]; then
+  export ANSIBLE_CONFIG="${ANSIBLE_CFG}"
 fi
 
 exec ansible -i "${ANSIBLE_INVENTORY}" -u "${ANSIBLE_SSH_USER}" --private-key "${ANSIBLE_SSH_PRIVATE_KEY}" swarm_all -m ping

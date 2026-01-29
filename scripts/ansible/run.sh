@@ -33,6 +33,10 @@ if [[ ! -f "${ANSIBLE_INVENTORY}" ]]; then
   exit 1
 fi
 
+if [[ -f "${ANSIBLE_CFG}" ]]; then
+  export ANSIBLE_CONFIG="${ANSIBLE_CFG}"
+fi
+
 cmd=(ansible-playbook -i "${ANSIBLE_INVENTORY}" -u "${ANSIBLE_SSH_USER}" --private-key "${ANSIBLE_SSH_PRIVATE_KEY}" --forks "${ANSIBLE_FORKS}")
 
 if [[ "${ANSIBLE_BECOME}" == "1" ]]; then
