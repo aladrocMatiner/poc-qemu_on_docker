@@ -83,7 +83,8 @@ while read -r node; do
     --arg swarm_mac "${swarm_mac}" \
     --arg mgmt_ip "${mgmt_ip}" \
     --arg ssh_target "${ssh_target}" \
-    '{index:$index,name:$name,mgmt_mac:$mgmt_mac,swarm_mac:$swarm_mac,mgmt_ip:($mgmt_ip|select(length>0)),ssh_target:$ssh_target}')
+    '{index:$index,name:$name,mgmt_mac:$mgmt_mac,swarm_mac:$swarm_mac,ssh_target:$ssh_target}
+     | if ($mgmt_ip | length) > 0 then . + {mgmt_ip:$mgmt_ip} else . end')
 
   nodes_json=$(jq -c --argjson node "${node_obj}" '. + [$node]' <<<"${nodes_json}")
 
