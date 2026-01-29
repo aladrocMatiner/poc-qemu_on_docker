@@ -16,6 +16,9 @@
 - **Skills** define *how*.
 - Agents **own specs** and use skills to implement them.
 - Every skill must reference at least one spec ID.
+- Ownership guidance:
+  - **IaCOps** owns specs that touch `infra/`, OpenTofu outputs, or provisioning state.
+  - **AnsibleOps** owns specs that touch `ansible/` playbooks, roles, or inventories.
 
 ## Acceptance tests
 - Each spec must include acceptance tests with commands and expected outcomes.

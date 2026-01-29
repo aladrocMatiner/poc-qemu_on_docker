@@ -171,7 +171,7 @@ specs:
 
   - id: libvirt-host-setup
     title: Libvirt host readiness for local lab
-    owner_agent: netops
+    owner_agent: iacops
     status: draft
     priority: high
     dependencies: []
@@ -191,7 +191,7 @@ specs:
 
   - id: tofu-inventory-access
     title: Inventory and SSH access from OpenTofu outputs
-    owner_agent: sre
+    owner_agent: iacops
     status: draft
     priority: medium
     dependencies: [libvirt-host-setup, cloudinit-baseline]
