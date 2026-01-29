@@ -16,3 +16,6 @@
 
 ## Port conventions
 - If forwarded ports are used, keep a documented reserved range and avoid collisions.
+
+## Language
+- Project documentation, specs, and code comments MUST be written in English, even if discussion happens in Spanish.

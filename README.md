@@ -11,11 +11,19 @@ $ cp .env.example .env
 $ ${EDITOR:-nano} .env
 ```
 
+Notes:
+- `SWARM_BRIDGE` must exist on the host (default `br0`).
+- If you do not have a bridge yet, create one with:
+  `HOST_NETWORK_ASSUME_YES=1 make host-network-setup`
+  (this creates the bridge only; it does not attach a NIC or assign IPs).
+
 2. Bootstrap host tools:
 
 ```bash
 $ make bootstrap
 ```
+
+If bootstrap adds you to `libvirt`, `kvm`, or `docker` groups, log out/in to apply.
 
 3. Initialize and apply lab:
 
@@ -53,6 +61,8 @@ $ make smoke
 ```bash
 $ make doctor
 ```
+
+`make doctor` runs `tofu validate`, so ensure `make lab-init` has been run at least once.
 
 ## Management Modes
 
