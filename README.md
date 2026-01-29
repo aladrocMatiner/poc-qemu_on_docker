@@ -16,6 +16,9 @@ Notes:
 - If you do not have a bridge yet, create one with:
   `HOST_NETWORK_ASSUME_YES=1 make host-network-setup`
   (this creates the bridge only; it does not attach a NIC or assign IPs).
+- Lab domains disable AppArmor confinement via libvirt `seclabel` injection
+  (`infra/modules/swarm_lab/domain-seclabel-none.xslt`) to avoid disk access
+  denials.
 
 2. Bootstrap host tools:
 
