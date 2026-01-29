@@ -19,6 +19,18 @@
 - Ownership guidance:
   - **IaCOps** owns specs that touch `infra/`, OpenTofu outputs, or provisioning state.
   - **AnsibleOps** owns specs that touch `ansible/` playbooks, roles, or inventories.
+  - **PlatformQA** owns the test contract and smoke-test sequencing.
+
+## Test contract (Phase 1)
+- Prefer acceptance tests that call Make targets.
+- Standard sequence for Phase 1 validation:
+  - `make bootstrap`
+  - `make lab-up`
+  - `make lab-status`
+  - `make ansible-inventory`
+  - `make ansible-baseline ansible-docker ansible-swarm`
+  - `make ansible-verify`
+  - `make lab-destroy`
 
 ## Acceptance tests
 - Each spec must include acceptance tests with commands and expected outcomes.

@@ -1,0 +1,57 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get update && sudo apt-get install -y shellcheck curl gnupg jq
+
+      - name: Install OpenTofu
+        run: |
+          sudo install -m 0755 -d /etc/apt/keyrings
+          curl -fsSL https://get.opentofu.org/opentofu.gpg | sudo tee /etc/apt/keyrings/opentofu.gpg >/dev/null
+          curl -fsSL https://packages.opentofu.org/opentofu/tofu/gpgkey | sudo gpg --no-tty --batch --dearmor -o /etc/apt/keyrings/opentofu-repo.gpg >/dev/null
+          sudo chmod a+r /etc/apt/keyrings/opentofu.gpg /etc/apt/keyrings/opentofu-repo.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/opentofu.gpg,/etc/apt/keyrings/opentofu-repo.gpg] https://packages.opentofu.org/opentofu/tofu/any/ any main" | sudo tee /etc/apt/sources.list.d/opentofu.list
+          sudo apt-get update && sudo apt-get install -y tofu
+
+      - name: Shellcheck
+        run: |
+          files=$(find scripts -type f -name '*.sh')
+          if [ -n "$files" ]; then
+            shellcheck $files
+          fi
+
+      - name: Tofu fmt
+        run: tofu -chdir=infra fmt -check -recursive
+
+      - name: Tofu validate
+        env:
+          TF_VAR_lab_name: ci-lab
+          TF_VAR_lab_nodes: 1
+          TF_VAR_vm_cpu: 1
+          TF_VAR_vm_ram_mb: 512
+          TF_VAR_vm_disk_gb: 5
+          TF_VAR_mgmt_mode: user
+          TF_VAR_mgmt_bridge: ""
+          TF_VAR_mgmt_network: default
+          TF_VAR_swarm_bridge: br0
+          TF_VAR_mac_prefix: 52:54:00:ab:cd
+          TF_VAR_ssh_user: ubuntu
+          TF_VAR_ssh_pubkey_path: ~/.ssh/id_ed25519.pub
+          TF_VAR_base_image_name: base.img
+          TF_VAR_downloads_dir: work/downloads
+          TF_VAR_pool_path: work/libvirt-pool
+          TF_VAR_libvirt_uri: qemu:///system
+        run: |
+          mkdir -p ~/.ssh
+          echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFAKEKEYFORCI" > ~/.ssh/id_ed25519.pub
+          tofu -chdir=infra init -backend=false
+          tofu -chdir=infra validate
