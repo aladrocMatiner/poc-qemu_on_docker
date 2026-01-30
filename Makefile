@@ -9,7 +9,7 @@ endif
 
 .PHONY: bootstrap prereqs-check \
 	tofu-init tofu-fmt tofu-validate tofu-plan tofu-apply tofu-destroy tofu-output \
-	lab-init lab-up lab-destroy lab-status lab-console \
+	lab-init lab-up lab-destroy lab-status lab-console lab-ssh \
 	ansible-bootstrap ansible-inventory ansible-ping ansible-baseline ansible-docker ansible-swarm ansible-verify ansible-run \
 	smoke smoke-idempotent test-matrix \
 	image-fetch image-verify image-info image-clean \
@@ -67,6 +67,9 @@ lab-status: tofu-output
 
 lab-console:
 	@./scripts/lab/console.sh
+
+lab-ssh:
+	@./scripts/lab/ssh.sh
 
 ansible-bootstrap:
 	@./scripts/ansible/galaxy_install.sh
