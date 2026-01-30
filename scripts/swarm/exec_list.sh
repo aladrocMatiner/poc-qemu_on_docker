@@ -36,28 +36,30 @@ if [[ -n "${SSH_KEY}" && -f "${SSH_KEY}" ]]; then
   ssh_opts+=(-i "${SSH_KEY}")
 fi
 
+services_list=$(IFS=','; echo "${services[*]}")
 jq -r '.nodes[] | select(.mgmt_ip) | "\(.name)|\(.mgmt_ip)"' "${INV_JSON}" | while IFS='|' read -r node ip; do
   if [[ -z "${printed_header:-}" ]]; then
     printf "%-64s %-20s %-15s %s\n" "CONTAINER" "NODE" "IP" "SERVICE"
     printed_header=1
   fi
-  out=$(ssh "${ssh_opts[@]}" "${SSH_USER}@${ip}" bash -s <<EOF_REMOTE || true
+  out=$(ssh "${ssh_opts[@]}" "${SSH_USER}@${ip}" "SERVICES_LIST='${services_list}' NODE_NAME='${node}' bash -s" <<'EOF_REMOTE' || true
 set -euo pipefail
 DOCKER=docker
-if ! \$DOCKER ps >/dev/null 2>&1; then
+if ! $DOCKER ps >/dev/null 2>&1; then
   if sudo -n docker ps >/dev/null 2>&1; then
     DOCKER="sudo -n docker"
   else
-    echo "docker access denied on ${node}. Add user to docker group or use sudo."
+    echo "docker access denied on ${NODE_NAME}. Add user to docker group or use sudo."
     exit 0
   fi
 fi
 HOST=$(hostname -s 2>/dev/null || hostname)
+IFS=',' read -r -a services <<<"${SERVICES_LIST}"
 for svc in "${services[@]}"; do
-  \$DOCKER ps --filter label=com.docker.swarm.service.name=\${svc} --format '{{.ID}} {{.Names}}' | while read -r id name; do
-    if [[ -n "\${id}" ]]; then
-      ip=\$(\$DOCKER inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "\${id}")
-      printf "%s %s %s\\n" "\${name}" "\${ip}" "\${svc}"
+  $DOCKER ps --filter label=com.docker.swarm.service.name=${svc} --format '{{.ID}} {{.Names}}' | while read -r id name; do
+    if [[ -n "${id}" ]]; then
+      ip=$($DOCKER inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "${id}")
+      printf "%s %s %s\\n" "${name}" "${ip}" "${svc}"
     fi
   done
 done
