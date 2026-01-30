@@ -11,7 +11,7 @@ endif
 	tofu-init tofu-fmt tofu-validate tofu-plan tofu-apply tofu-destroy tofu-output \
 	lab-init lab-up lab-destroy lab-status lab-console lab-ssh \
 	ansible-bootstrap ansible-inventory ansible-ping ansible-baseline ansible-docker ansible-swarm ansible-verify ansible-swarm-status ansible-run \
-	ansible-swarm-poc-qemu-demo ansible-swarm-poc-qemu-linux ansible-swarm-poc-qemu-windows \
+	ansible-swarm-poc-qemu-demo ansible-swarm-poc-qemu-linux ansible-swarm-poc-qemu-windows ansible-swarm-services \
 	ansible-all \
 	smoke smoke-idempotent test-matrix \
 	image-fetch image-verify image-info image-clean \
@@ -96,6 +96,9 @@ ansible-verify:
 
 ansible-swarm-status:
 	@./scripts/ansible/run.sh ansible/playbooks/swarm_status.yml
+
+ansible-swarm-services:
+	@./scripts/ansible/run.sh ansible/playbooks/swarm_services.yml
 
 ansible-swarm-poc-qemu-demo:
 	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_linux_demo.yml

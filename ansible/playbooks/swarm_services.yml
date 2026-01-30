@@ -1,0 +1,14 @@
+---
+- name: Swarm services status
+  hosts: swarm_managers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: List services
+      ansible.builtin.command: !unsafe docker service ls --format '{{.Name}} {{.Mode}} {{.Replicas}} {{.Image}}'
+      register: svc_list
+      changed_when: false
+
+    - name: Print services
+      ansible.builtin.debug:
+        msg: "{{ svc_list.stdout_lines | default([]) }}"
