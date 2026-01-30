@@ -96,7 +96,7 @@ ansible-verify:
 ansible-swarm-status:
 	@./scripts/ansible/run.sh ansible/playbooks/swarm_status.yml
 
-ansible-all: ansible-bootstrap ansible-inventory ansible-ping ansible-baseline ansible-docker ansible-swarm ansible-verify
+ansible-all: lab-status ansible-bootstrap ansible-inventory ansible-ping ansible-baseline ansible-docker ansible-swarm ansible-verify
 
 ansible-run:
 	@./scripts/ansible/run.sh $(PLAYBOOK)
