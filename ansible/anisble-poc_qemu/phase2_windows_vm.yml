@@ -1,9 +1,34 @@
 ---
-- name: Phase 2 Windows VM (placeholder)
-  hosts: swarm_all
+- name: Phase 2 Windows VM (deploy + validate)
+  hosts: swarm_managers
   become: true
   gather_facts: false
+  vars:
+    stack_name: phase2-windows-vm
+    stack_src: "{{ playbook_dir }}/../../stacks/phase2-windows-vm.yml"
+    stack_dest: /tmp/phase2-windows-vm.yml
+  roles:
+    - swarm_stack
+    - swarm_stack_status
+
   tasks:
-    - name: Placeholder
-      ansible.builtin.fail:
-        msg: "Not implemented yet. This playbook will validate Windows VM runner boot and access."
+    - name: Print Windows VM IPs if provided
+      ansible.builtin.debug:
+        msg: "Windows VM IPs: {{ vm_windows_ips }}"
+      when: vm_windows_ips is defined and (vm_windows_ips | length) > 0
+
+    - name: Wait for Windows RDP (optional)
+      ansible.builtin.wait_for:
+        host: "{{ item }}"
+        port: 3389
+        timeout: 120
+      loop: "{{ vm_windows_ips | default([]) }}"
+      when: vm_windows_ips is defined and (vm_windows_ips | length) > 0
+
+    - name: Wait for Windows WinRM (optional)
+      ansible.builtin.wait_for:
+        host: "{{ item }}"
+        port: 5985
+        timeout: 120
+      loop: "{{ vm_windows_ips | default([]) }}"
+      when: vm_windows_ips is defined and (vm_windows_ips | length) > 0

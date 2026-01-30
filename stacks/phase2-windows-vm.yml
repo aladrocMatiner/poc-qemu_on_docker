@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  vm-runner-windows:
+    image: ${VM_RUNNER_WINDOWS_IMAGE:-poc/vm-runner-windows:latest}
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    network_mode: host
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.vm-capable==true
+      restart_policy:
+        condition: any
+    environment:
+      VM_NAME: swarm-lab-windows
+      VM_MAC: 52:54:00:ab:cd:51
+      VM_DISK: /vm/images/windows.qcow2
+      VM_WINDOWS_ISO: /vm/isos/windows.iso
+      VM_VIRTIO_ISO: /vm/isos/virtio.iso
+      VM_BRIDGE: br0
+    volumes:
+      - /var/lib/vmrunner/images:/vm/images
+      - /var/lib/vmrunner/isos:/vm/isos

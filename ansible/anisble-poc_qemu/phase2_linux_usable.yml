@@ -1,9 +1,26 @@
 ---
-- name: Phase 2 Linux usable VM (placeholder)
-  hosts: swarm_all
+- name: Phase 2 Linux VM usable (deploy + validate)
+  hosts: swarm_managers
   become: true
   gather_facts: false
+  vars:
+    stack_name: phase2-linux-usable
+    stack_src: "{{ playbook_dir }}/../../stacks/phase2-linux-usable.yml"
+    stack_dest: /tmp/phase2-linux-usable.yml
+  roles:
+    - swarm_stack
+    - swarm_stack_status
+
   tasks:
-    - name: Placeholder
-      ansible.builtin.fail:
-        msg: "Not implemented yet. This playbook will validate the reproducible Linux VM runner pipeline."
+    - name: Print Linux VM IPs if provided
+      ansible.builtin.debug:
+        msg: "Linux VM IPs: {{ vm_linux_ips }}"
+      when: vm_linux_ips is defined and (vm_linux_ips | length) > 0
+
+    - name: Wait for Linux VM SSH (optional)
+      ansible.builtin.wait_for:
+        host: "{{ item }}"
+        port: 22
+        timeout: 60
+      loop: "{{ vm_linux_ips | default([]) }}"
+      when: vm_linux_ips is defined and (vm_linux_ips | length) > 0
