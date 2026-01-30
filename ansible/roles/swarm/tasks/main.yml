@@ -31,12 +31,21 @@
     path: /dev/kvm
   register: kvm_device
 
-- name: Apply vm-capable labels from manager
+- name: Apply vm-capable label when /dev/kvm exists
   ansible.builtin.command: >
-    docker node update
-    {{ '--label-add vm-capable=true' if (hostvars[item].kvm_device.stat.exists | default(false)) else '--label-rm vm-capable' }}
-    {{ item }}
+    docker node update --label-add vm-capable=true {{ item }}
   loop: "{{ groups['swarm_managers'] + groups['swarm_workers'] }}"
+  when: hostvars[item].kvm_device.stat.exists | default(false)
+  run_once: true
+  delegate_to: "{{ groups['swarm_managers'][0] }}"
+
+- name: Remove vm-capable label when /dev/kvm is missing (if present)
+  ansible.builtin.shell: >
+    if docker node inspect {{ item }} --format '{{ "{{.Spec.Labels}}" }}' | grep -q 'vm-capable'; then
+      docker node update --label-rm vm-capable {{ item }};
+    fi
+  loop: "{{ groups['swarm_managers'] + groups['swarm_workers'] }}"
+  when: not (hostvars[item].kvm_device.stat.exists | default(false))
   run_once: true
   delegate_to: "{{ groups['swarm_managers'][0] }}"
 
