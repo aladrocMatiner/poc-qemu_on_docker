@@ -11,3 +11,4 @@ Start with specs in `../specs/` and follow skills in `../skills/`.
 - `adr/` — architecture decisions (required for major changes)
 - `runbooks/` — operational procedures and troubleshooting
 - `diagrams/` — network and architecture diagrams
+- `phase2.md` — Phase 2 PoC goals and demo cases
