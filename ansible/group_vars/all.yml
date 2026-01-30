@@ -4,3 +4,7 @@ ansible_user: "{{ lookup('env', 'ANSIBLE_SSH_USER') | default('ubuntu', true) }}
 ansible_ssh_private_key_file: "{{ lookup('env', 'ANSIBLE_SSH_PRIVATE_KEY') | default('~/.ssh/id_ed25519', true) }}"
 
 swarm_advertise_addr: "{{ lookup('env', 'SWARM_ADVERTISE_ADDR') | default('', true) }}"
+
+vm_runner_keys_dir_host: "{{ lookup('env', 'VM_RUNNER_KEYS_DIR_HOST') | default('/var/lib/vmrunner/keys', true) }}"
+vm_runner_keys_dir_container: "{{ lookup('env', 'VM_RUNNER_KEYS_DIR_CONTAINER') | default('/vm/keys', true) }}"
+vm_ssh_key_path_in_container: "{{ lookup('env', 'VM_SSH_KEY_PATH_IN_CONTAINER') | default('/vm/keys/id_ed25519', true) }}"

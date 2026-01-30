@@ -11,7 +11,7 @@
     vm_service: "{{ stack_name }}_vm-runner-linux"
     vm_ssh_port: 2222
     vm_ssh_user: ubuntu
-    vm_ssh_key: /vm/keys/id_ed25519
+    vm_ssh_key: "{{ vm_ssh_key_path_in_container }}"
   tasks:
     - name: Ensure case01 services exist
       ansible.builtin.command: docker service ls --format '{{ "{{.Name}}" }}'

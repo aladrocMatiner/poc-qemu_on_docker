@@ -54,4 +54,4 @@ services:
     volumes:
       - /var/lib/vmrunner/images:/vm/images
       - /var/lib/vmrunner/seeds:/vm/seeds
-      - /var/lib/vmrunner/keys:/vm/keys:ro
+      - ${VM_RUNNER_KEYS_DIR_HOST:-/var/lib/vmrunner/keys}:${VM_RUNNER_KEYS_DIR_CONTAINER:-/vm/keys}:ro
