@@ -1,0 +1,4 @@
+---
+stack_name: phase2-linux-demo
+stack_src: ""
+stack_dest: /tmp/phase2-linux-demo.yml

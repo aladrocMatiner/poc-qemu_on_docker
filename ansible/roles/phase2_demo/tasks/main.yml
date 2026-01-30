@@ -1,0 +1,16 @@
+---
+- name: Assert required vars for Phase 2 demo
+  ansible.builtin.assert:
+    that:
+      - stack_name | length > 0
+      - stack_src | length > 0
+      - stack_dest | length > 0
+    fail_msg: "stack_name, stack_src, and stack_dest are required for phase2_demo"
+
+- name: Deploy demo stack
+  ansible.builtin.import_role:
+    name: swarm_stack
+
+- name: Validate demo stack status
+  ansible.builtin.import_role:
+    name: swarm_stack_status

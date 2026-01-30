@@ -22,6 +22,7 @@ $ make ansible-swarm-poc-qemu-windows
 Roles used by Phase 2 playbooks:
 - `roles/swarm_stack`
 - `roles/swarm_stack_status`
+- `roles/phase2_demo`
 - `roles/vm_runner_linux`
 - `roles/vm_runner_windows`
 

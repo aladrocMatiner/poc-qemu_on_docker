@@ -8,5 +8,4 @@
     stack_src: "{{ playbook_dir }}/../../stacks/phase2-linux-demo.yml"
     stack_dest: /tmp/phase2-linux-demo.yml
   roles:
-    - swarm_stack
-    - swarm_stack_status
+    - phase2_demo
