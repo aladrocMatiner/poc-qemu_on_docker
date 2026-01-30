@@ -32,8 +32,8 @@ If bootstrap adds you to `libvirt`, `kvm`, or `docker` groups, log out/in to app
 
 ```bash
 $ make lab-init
-$ make image-fetch
-$ make lab-up
+$ make image-fetch   # download base cloud image
+$ make lab-up        # provision VMs via OpenTofu/libvirt
 ```
 
 4. Generate inventory and inspect status:
