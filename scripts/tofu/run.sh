@@ -53,8 +53,12 @@ export TF_VAR_libvirt_uri="${LIBVIRT_URI:-qemu:///system}"
 
 seclabel_mode=${LIBVIRT_SECLABEL_MODE:-auto}
 if [[ "${seclabel_mode}" == "auto" ]]; then
-  if [[ -d /sys/module/apparmor ]]; then
-    seclabel_mode="apparmor"
+  if command -v virsh >/dev/null 2>&1; then
+    if virsh -c "${TF_VAR_libvirt_uri}" domcapabilities 2>/dev/null | grep -q "<model>apparmor</model>"; then
+      seclabel_mode="apparmor"
+    else
+      seclabel_mode="none"
+    fi
   else
     seclabel_mode="none"
   fi

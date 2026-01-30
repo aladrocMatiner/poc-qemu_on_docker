@@ -27,5 +27,5 @@ This writes `work/inventory.json`.
 - If IP discovery fails: check DHCP leases for the management network. For fixed IPs, set `MGMT_NETWORK_CIDR` and `MGMT_IP_START` in `.env`.
 - If QEMU reports `Permission denied` for disk images: AppArmor may be
   blocking access. Control this via `LIBVIRT_SECLABEL_MODE`:
-  `auto` (default) enables the AppArmor seclabel only when supported,
-  `apparmor` forces it, and `none` disables it.
+  `auto` (default) enables the AppArmor seclabel only when libvirt reports
+  it in `virsh domcapabilities`, `apparmor` forces it, and `none` disables it.
