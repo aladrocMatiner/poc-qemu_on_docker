@@ -19,6 +19,7 @@
 - Ownership guidance:
   - **IaCOps** owns specs that touch `infra/`, OpenTofu outputs, or provisioning state.
   - **AnsibleOps** owns specs that touch `ansible/` playbooks, roles, or inventories.
+  - **VMRunnerOps** owns specs for QEMU-in-container runtime and VM runner lifecycle.
   - **PlatformQA** owns the test contract and smoke-test sequencing.
 
 ## Test contract (Phase 1)
