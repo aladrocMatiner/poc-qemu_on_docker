@@ -133,16 +133,16 @@ ansible-swarm-poc-qemu-case00-exec:
 	@./scripts/swarm/exec.sh $(if $(EXEC_NAME),$(EXEC_NAME),$(NAME))
 
 ansible-swarm-poc-qemu-case01-up:
-	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_linux_usable.yml
+	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case01_up.yml
 
 ansible-swarm-poc-qemu-case01-down:
 	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case01_down.yml
 
 ansible-swarm-poc-qemu-case01-test:
-	@STACK_NAME=phase2-linux-usable ./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case00_test.yml
+	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case01_test.yml
 
 ansible-swarm-poc-qemu-case01-exec-list:
-	@STACK_NAME=phase2-linux-usable ./scripts/swarm/exec_list.sh
+	@STACK_NAME=phase2-linux-usable CASE_PREFIX=case01 ./scripts/swarm/exec_list.sh
 
 ansible-swarm-poc-qemu-case01-exec:
 	@STACK_NAME=phase2-linux-usable ./scripts/swarm/exec.sh $(if $(EXEC_NAME),$(EXEC_NAME),$(NAME))

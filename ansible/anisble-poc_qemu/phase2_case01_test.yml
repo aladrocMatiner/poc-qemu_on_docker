@@ -1,0 +1,122 @@
+---
+- name: Phase 2 Case 01 test (services + VM connectivity)
+  hosts: swarm_managers
+  become: true
+  gather_facts: false
+  vars:
+    stack_name: phase2-linux-usable
+    case_prefix: case01
+    svc_web: "{{ stack_name }}_{{ case_prefix }}-web"
+    svc_ping: "{{ stack_name }}_{{ case_prefix }}-ping"
+    vm_service: "{{ stack_name }}_vm-runner-linux"
+    vm_ssh_port: 2222
+    vm_ssh_user: ubuntu
+    vm_ssh_key: /vm/keys/id_ed25519
+  tasks:
+    - name: Ensure case01 services exist
+      ansible.builtin.command: docker service ls --format '{{ "{{.Name}}" }}'
+      register: svc_names
+      changed_when: false
+
+    - name: Assert case01 services are present
+      ansible.builtin.assert:
+        that:
+          - svc_web in svc_names.stdout_lines
+          - svc_ping in svc_names.stdout_lines
+        fail_msg: "Missing case01 services. Run case01 up first."
+
+    - name: Get node for case01-ping task
+      ansible.builtin.command: >
+        docker service ps {{ svc_ping }}
+        --filter desired-state=running
+        --format '{{ "{{.Node}}" }}'
+      register: ping_nodes
+      changed_when: false
+
+    - name: Ensure case01-ping task is running
+      ansible.builtin.assert:
+        that:
+          - ping_nodes.stdout_lines | length > 0
+        fail_msg: "case01-ping has no running tasks."
+
+    - name: Resolve case01-ping container id on its node
+      ansible.builtin.command: >
+        docker ps --filter label=com.docker.swarm.service.name={{ svc_ping }}
+        --format '{{ "{{.ID}}" }}'
+      register: ping_container
+      changed_when: false
+      delegate_to: "{{ ping_nodes.stdout_lines[0] }}"
+
+    - name: Ensure case01-ping container exists
+      ansible.builtin.assert:
+        that:
+          - ping_container.stdout | length > 0
+        fail_msg: "case01-ping container not found on node {{ ping_nodes.stdout_lines[0] }}."
+
+    - name: Ping case01-web from case01-ping container
+      ansible.builtin.command: >
+        docker exec {{ ping_container.stdout }}
+        ping -c 1 {{ case_prefix }}-web
+      register: ping_result
+      changed_when: false
+      delegate_to: "{{ ping_nodes.stdout_lines[0] }}"
+
+    - name: HTTP check from case01-ping to case01-web
+      ansible.builtin.command: >
+        docker exec {{ ping_container.stdout }}
+        /bin/sh -c "wget -qO- http://{{ case_prefix }}-web >/dev/null"
+      register: http_check
+      changed_when: false
+      delegate_to: "{{ ping_nodes.stdout_lines[0] }}"
+
+    - name: Show service connectivity results
+      ansible.builtin.debug:
+        msg:
+          - "case01-ping -> case01-web ping rc: {{ ping_result.rc | default('n/a') }}"
+          - "case01-ping -> case01-web http rc: {{ http_check.rc | default('n/a') }}"
+
+    - name: Get vm-runner container id
+      ansible.builtin.command: docker ps --filter label=com.docker.swarm.service.name={{ vm_service }} --format '{{ "{{.ID}}" }}'
+      register: vm_runner_container
+      changed_when: false
+
+    - name: Ensure vm-runner container is running
+      ansible.builtin.assert:
+        that:
+          - vm_runner_container.stdout | length > 0
+        fail_msg: "vm-runner-linux container not running."
+
+    - name: Ensure VM SSH key is available in vm-runner container
+      ansible.builtin.command: >
+        docker exec {{ vm_runner_container.stdout }}
+        /bin/sh -c "test -f {{ vm_ssh_key }}"
+      register: vm_key_check
+      changed_when: false
+
+    - name: Assert VM SSH key exists
+      ansible.builtin.assert:
+        that:
+          - vm_key_check.rc == 0
+        fail_msg: "Missing VM SSH key at {{ vm_ssh_key }} inside vm-runner container."
+
+    - name: Ensure vm-runner container is on case01-net
+      ansible.builtin.command: docker inspect --format '{{ "{{ range $k, $v := .NetworkSettings.Networks }}{{ $k }} {{ end }}" }}' {{ vm_runner_container.stdout }}
+      register: vm_runner_networks
+      changed_when: false
+
+    - name: Validate vm-runner network attachment
+      ansible.builtin.assert:
+        that:
+          - "'case01-net' in vm_runner_networks.stdout"
+        fail_msg: "vm-runner-linux is not attached to case01-net (overlay)."
+
+    - name: Check VM can reach case01-web (via SSH inside VM)
+      ansible.builtin.command: >
+        docker exec {{ vm_runner_container.stdout }}
+        /bin/sh -c "ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -i {{ vm_ssh_key }} -p {{ vm_ssh_port }} {{ vm_ssh_user }}@127.0.0.1 ping -c 1 {{ case_prefix }}-web"
+      register: vm_ping
+      changed_when: false
+
+    - name: Show VM ping result
+      ansible.builtin.debug:
+        msg: "VM -> {{ case_prefix }}-web: {{ vm_ping.stdout | default('') }}"

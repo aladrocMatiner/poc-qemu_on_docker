@@ -1,14 +1,41 @@
 version: "3.9"
 
+networks:
+  case01-net:
+    driver: overlay
+
 services:
+  case01-web:
+    image: nginx:alpine
+    networks:
+      - case01-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.case01-web==true
+      restart_policy:
+        condition: any
+
+  case01-ping:
+    image: alpine:3.19
+    command: ["/bin/sh", "-c", "sleep 3600"]
+    networks:
+      - case01-net
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.case01-ping==true
+      restart_policy:
+        condition: any
+
   vm-runner-linux:
     image: ${VM_RUNNER_LINUX_IMAGE:-poc/vm-runner-linux:latest}
     devices:
       - /dev/kvm
-      - /dev/net/tun
-    cap_add:
-      - NET_ADMIN
-    network_mode: host
+    networks:
+      - case01-net
     deploy:
       replicas: 1
       placement:
@@ -21,7 +48,10 @@ services:
       VM_MAC: 52:54:00:ab:cd:41
       VM_DISK: /vm/images/linux.qcow2
       VM_SEED: /vm/seeds/linux-seed.iso
-      VM_BRIDGE: br0
+      VM_NET_MODE: user
+      VM_SSH_FWD_PORT: 2222
+      VM_SSH_USER: ubuntu
     volumes:
       - /var/lib/vmrunner/images:/vm/images
       - /var/lib/vmrunner/seeds:/vm/seeds
+      - /var/lib/vmrunner/keys:/vm/keys:ro

@@ -1,0 +1,12 @@
+---
+- name: Phase 2 Case 01 (normal services + Linux VM runner)
+  hosts: swarm_managers
+  become: true
+  gather_facts: false
+  vars:
+    stack_name: phase2-linux-usable
+    stack_src: "{{ playbook_dir }}/../../stacks/phase2-linux-usable.yml"
+    stack_dest: /tmp/phase2-linux-usable.yml
+    case_prefix: case01
+  roles:
+    - phase2_demo
