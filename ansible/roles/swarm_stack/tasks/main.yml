@@ -1,0 +1,10 @@
+---
+- name: Copy stack file to manager
+  ansible.builtin.copy:
+    src: "{{ stack_src }}"
+    dest: "{{ stack_dest }}"
+    mode: "0644"
+
+- name: Deploy stack
+  ansible.builtin.command: docker stack deploy -c {{ stack_dest }} {{ stack_name }}
+  changed_when: false

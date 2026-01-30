@@ -1,9 +1,12 @@
 ---
-- name: Phase 2 Linux demo (placeholder)
-  hosts: swarm_all
+- name: Phase 2 Linux demo (deploy + validate)
+  hosts: swarm_managers
   become: true
   gather_facts: false
-  tasks:
-    - name: Placeholder
-      ansible.builtin.fail:
-        msg: "Not implemented yet. This playbook will validate Swarm + normal service + Linux VM runner coexistence."
+  vars:
+    stack_name: phase2-linux-demo
+    stack_src: "{{ playbook_dir }}/../../stacks/phase2-linux-demo.yml"
+    stack_dest: /tmp/phase2-linux-demo.yml
+  roles:
+    - swarm_stack
+    - swarm_stack_status

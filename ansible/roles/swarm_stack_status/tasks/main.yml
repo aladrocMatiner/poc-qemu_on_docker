@@ -1,0 +1,12 @@
+---
+- name: List stack services
+  ansible.builtin.command: !unsafe docker stack services {{ stack_name }} --format '{{.Name}}'
+  register: stack_services
+  changed_when: false
+
+- name: Ensure services have running tasks
+  ansible.builtin.command: !unsafe docker service ps --filter desired-state=running --format '{{.Name}}' {{ item }}
+  register: service_tasks
+  changed_when: false
+  failed_when: service_tasks.stdout_lines | length < 1
+  loop: "{{ stack_services.stdout_lines }}"

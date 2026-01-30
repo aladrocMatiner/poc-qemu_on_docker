@@ -9,3 +9,4 @@
 - `docs/adr/` — architecture decision records (required for major decisions).
 - `docs/runbooks/` — operational runbooks (deploy, troubleshoot, recover).
 - `docs/diagrams/` — network and architecture diagrams referenced by docs.
+- `stacks/` — Swarm stack templates (Phase 2 and beyond).

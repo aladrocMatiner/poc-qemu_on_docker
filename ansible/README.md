@@ -12,5 +12,13 @@ $ make ansible-swarm
 $ make ansible-verify
 ```
 
+## Phase 2 PoC playbooks
+Playbooks for the QEMU-in-container PoC live under `ansible/anisble-poc_qemu/`.
+```bash
+$ make ansible-swarm-poc-qemu-demo
+$ make ansible-swarm-poc-qemu-linux
+$ make ansible-swarm-poc-qemu-windows
+```
+
 ## Inventory
 Generated inventory is written to `ansible/inventories/generated/inventory.ini`.

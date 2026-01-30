@@ -1,0 +1,42 @@
+version: "3.9"
+
+networks:
+  demo-net:
+    driver: overlay
+
+services:
+  demo-web:
+    image: nginx:alpine
+    networks:
+      - demo-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+
+  vm-runner-linux:
+    image: ${VM_RUNNER_LINUX_IMAGE:-poc/vm-runner-linux:latest}
+    # NOTE: QEMU runner requires /dev/kvm and (optionally) /dev/net/tun.
+    # No privileged mode allowed in Swarm.
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    network_mode: host
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.vm-capable==true
+      restart_policy:
+        condition: any
+    environment:
+      VM_NAME: swarm-lab-vm1
+      VM_MAC: 52:54:00:ab:cd:31
+      VM_DISK: /vm/images/linux.qcow2
+      VM_SEED: /vm/seeds/linux-seed.iso
+      VM_BRIDGE: br0
+    volumes:
+      - /var/lib/vmrunner/images:/vm/images
+      - /var/lib/vmrunner/seeds:/vm/seeds

@@ -4,6 +4,7 @@
 - VMs: `${LAB_NAME}-node<N>` (e.g., `swarm-lab-node1`)
 - Bridges: `SWARM_BRIDGE` (default `br0`), `MGMT_BRIDGE` (optional)
 - Inventory: `work/inventory.json`
+- Stacks: `phase2-<name>` (e.g., `phase2-linux-demo`)
 
 ## MAC derivation
 - Deterministic per node and NIC.
