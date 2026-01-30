@@ -1,2 +1,9 @@
 secrets/
 *.key
+.env
+.env.*
+work/
+infra/terraform.tfstate
+infra/terraform.tfstate.*
+infra/work/
+ansible/inventories/generated/
