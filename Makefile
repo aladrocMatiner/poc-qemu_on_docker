@@ -124,7 +124,7 @@ ansible-swarm-poc-qemu-case00-test:
 ansible-swarm-poc-qemu-case00-exec-list:
 	@./scripts/swarm/exec_list.sh
 
-ifneq (,$(filter ansible-swarm-poc-qemu-case00-exec,$(MAKECMDGOALS)))
+ifneq (,$(filter ansible-swarm-poc-qemu-case00-exec ansible-swarm-poc-qemu-case01-exec,$(MAKECMDGOALS)))
 EXEC_NAME := $(wordlist 2,2,$(MAKECMDGOALS))
 $(eval $(EXEC_NAME):;@:)
 endif
