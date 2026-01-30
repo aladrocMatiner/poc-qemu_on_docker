@@ -9,6 +9,7 @@ RUN apt-get update \
      ovmf \
      iproute2 \
      ca-certificates \
+     openssh-client \
   && rm -rf /var/lib/apt/lists/*
 
 COPY entrypoint.sh /usr/local/bin/vm-runner-entrypoint
