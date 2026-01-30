@@ -7,6 +7,18 @@
       - stack_dest | length > 0
     fail_msg: "stack_name, stack_src, and stack_dest are required for phase2_demo"
 
+- name: Get node labels
+  ansible.builtin.command: docker node ls --format '{{ "{{.Hostname}}" }}|{{ "{{.Labels}}" }}'
+  register: node_labels
+  changed_when: false
+
+- name: Ensure case00 labels exist on at least two nodes
+  ansible.builtin.assert:
+    that:
+      - node_labels.stdout is search('case00-web=true')
+      - node_labels.stdout is search('case00-ping=true')
+    fail_msg: "Missing case00 labels. Run: docker node update --label-add case00-web=true <nodeA> and case00-ping=true <nodeB>."
+
 - name: Deploy demo stack
   ansible.builtin.import_role:
     name: swarm_stack
