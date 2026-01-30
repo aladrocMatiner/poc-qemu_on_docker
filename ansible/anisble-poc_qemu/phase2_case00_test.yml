@@ -80,14 +80,14 @@
           - ping_nodes.stdout_lines[0] != web_nodes.stdout_lines[0]
         fail_msg: "case00 services are on the same node."
 
-    - name: Reverse ping from web node using ephemeral tester
+    - name: HTTP check from case00-ping to case00-web
       ansible.builtin.command: >
-        docker run --rm --network demo-net busybox:1.36
-        ping -c 1 case00-ping
-      register: reverse_ping
+        docker exec {{ ping_container.stdout }}
+        /bin/sh -c "wget -qO- http://case00-web >/dev/null"
+      register: http_check
       changed_when: false
-      delegate_to: "{{ web_nodes.stdout_lines[0] }}"
+      delegate_to: "{{ ping_nodes.stdout_lines[0] }}"
 
-    - name: Show reverse ping result
+    - name: Show HTTP check result
       ansible.builtin.debug:
-        msg: "case00-web-node -> case00-ping: {{ reverse_ping.stdout | default('') }}"
+        msg: "case00-ping -> case00-web HTTP: {{ http_check.rc }}"

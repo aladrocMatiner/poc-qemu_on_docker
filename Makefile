@@ -121,6 +121,12 @@ ansible-swarm-poc-qemu-case00-down:
 ansible-swarm-poc-qemu-case00-test:
 	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case00_test.yml
 
+ansible-swarm-poc-qemu-case00-exec-list:
+	@./scripts/swarm/exec_list.sh
+
+ansible-swarm-poc-qemu-case00-exec:
+	@./scripts/swarm/exec.sh NAME=$(NAME)
+
 ansible-swarm-poc-qemu-case01-up:
 	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_linux_usable.yml
 
