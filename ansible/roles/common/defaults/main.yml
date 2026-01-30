@@ -14,3 +14,15 @@ common_packages_redhat:
   - rsync
 
 common_timesync_package: chrony
+
+install_kvm_tools: true
+
+kvm_packages_debian:
+  - qemu-system-x86
+  - qemu-utils
+  - ovmf
+
+kvm_packages_redhat:
+  - qemu-kvm
+  - qemu-img
+  - edk2-ovmf

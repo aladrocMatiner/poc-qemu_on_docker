@@ -16,3 +16,23 @@
   ansible.builtin.package:
     name: "{{ common_timesync_package }}"
     state: present
+
+- name: Select KVM package list
+  ansible.builtin.set_fact:
+    kvm_packages: "{{ kvm_packages_debian if ansible_facts.os_family == 'Debian' else kvm_packages_redhat }}"
+  when: install_kvm_tools | bool
+
+- name: Install KVM tooling (optional)
+  ansible.builtin.package:
+    name: "{{ kvm_packages }}"
+    state: present
+  when: install_kvm_tools | bool
+
+- name: Check /dev/kvm availability
+  ansible.builtin.stat:
+    path: /dev/kvm
+  register: kvm_device
+
+- name: Report /dev/kvm status
+  ansible.builtin.debug:
+    msg: "/dev/kvm present: {{ kvm_device.stat.exists | default(false) }}"

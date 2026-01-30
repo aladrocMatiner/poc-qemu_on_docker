@@ -26,6 +26,20 @@
     {{ hostvars[groups['swarm_managers'][0]].ansible_host | default(groups['swarm_managers'][0]) }}:2377
   when: inventory_hostname in groups['swarm_workers'] and swarm_state.stdout != 'active'
 
+- name: Check /dev/kvm on each node
+  ansible.builtin.stat:
+    path: /dev/kvm
+  register: kvm_device
+
+- name: Apply vm-capable labels from manager
+  ansible.builtin.command: >
+    docker node update
+    {{ '--label-add vm-capable=true' if (hostvars[item].kvm_device.stat.exists | default(false)) else '--label-rm vm-capable' }}
+    {{ item }}
+  loop: "{{ groups['swarm_managers'] + groups['swarm_workers'] }}"
+  run_once: true
+  delegate_to: "{{ groups['swarm_managers'][0] }}"
+
 - name: Build node label targets
   ansible.builtin.set_fact:
     swarm_label_targets: "{{ swarm_label_targets | default([]) + [ {

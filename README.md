@@ -106,6 +106,7 @@ $ make ansible-swarm-poc-qemu-case01-exec <container_name>
 $ make ansible-swarm-poc-qemu-case01-down
 ```
 Note: case01-test expects a VM SSH key at `/var/lib/vmrunner/keys/id_ed25519` on the host.
+Note: `make ansible-swarm` auto-labels nodes with `vm-capable=true` if `/dev/kvm` exists.
 
 Case 02: Windows VM runner
 ```bash
