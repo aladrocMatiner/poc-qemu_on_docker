@@ -29,3 +29,5 @@ This writes `work/inventory.json`.
   blocking access. Control this via `LIBVIRT_SECLABEL_MODE`:
   `auto` (default) enables the AppArmor seclabel only when libvirt reports
   it in `virsh domcapabilities`, `apparmor` forces it, and `none` disables it.
+- If you see `Permission denied` on qcow2 files under your home directory,
+  set `POOL_PATH` to a system directory like `/var/lib/libvirt/images/<lab>-pool`.

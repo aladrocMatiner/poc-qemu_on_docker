@@ -18,6 +18,8 @@ Notes:
   (this creates the bridge only; it does not attach a NIC or assign IPs).
 - Libvirt `seclabel` handling is controlled by `LIBVIRT_SECLABEL_MODE`
   (default `auto`).
+- If you see libvirt permission errors on qcow2 files, set `POOL_PATH` to a
+  system path like `/var/lib/libvirt/images/<lab>-pool`.
 
 2. Bootstrap host tools:
 

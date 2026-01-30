@@ -14,7 +14,7 @@ TOFU_BIN=${TOFU_BIN:-tofu}
 TOFU_STATE_DIR=${TOFU_STATE_DIR:-work/tofu-state}
 WORKDIR=${WORKDIR:-work}
 DOWNLOADS_DIR=${DOWNLOADS_DIR:-work/downloads}
-POOL_PATH=${POOL_PATH:-${WORKDIR}/libvirt-pool}
+POOL_PATH=${POOL_PATH:-/var/lib/libvirt/images/${LAB_NAME:-swarm-lab}-pool}
 
 abs_path() {
   local path=$1
