@@ -89,3 +89,4 @@ $ make doctor       # environment + toolchain checks
 - `docs/runbooks/opentofu-libvirt.md`
 - `docs/runbooks/network-modes.md`
 - `docs/standards.md`
+- `docs/phase2.md`
