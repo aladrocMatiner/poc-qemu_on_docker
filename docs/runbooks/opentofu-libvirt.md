@@ -31,3 +31,5 @@ This writes `work/inventory.json`.
   it in `virsh domcapabilities`, `apparmor` forces it, and `none` disables it.
 - If you see `Permission denied` on qcow2 files under your home directory,
   set `POOL_PATH` to a system directory like `/var/lib/libvirt/images/<lab>-pool`.
+- If apt cannot resolve hostnames inside VMs, ensure the libvirt mgmt network
+  has DNS enabled (the lab-managed network enables DNS by default).

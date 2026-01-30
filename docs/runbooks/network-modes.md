@@ -8,6 +8,7 @@ The lab supports two management access modes. The swarm NIC always attaches to `
 - Management IPs are discovered via `virsh net-dhcp-leases`.
 - If `MGMT_NETWORK_CIDR` is set, the lab creates/manages the network and reserves fixed IPs starting at `MGMT_IP_START`.
   Use a non-default `MGMT_NETWORK` name when enabling this.
+- The lab-managed network enables libvirt DNS so guests can resolve public repos.
 - Safer and requires no host bridge changes.
 
 ### MGMT_MODE=bridge
