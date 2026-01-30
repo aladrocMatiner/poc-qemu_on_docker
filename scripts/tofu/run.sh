@@ -27,6 +27,7 @@ abs_path() {
 
 DOWNLOADS_DIR=$(abs_path "${DOWNLOADS_DIR}")
 POOL_PATH=$(abs_path "${POOL_PATH}")
+ensure_libvirt_pool_permissions "${POOL_PATH}"
 
 cd "${ROOT_DIR}"
 mkdir -p "${TOFU_STATE_DIR}"

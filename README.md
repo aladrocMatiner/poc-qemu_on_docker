@@ -20,6 +20,7 @@ Notes:
   (default `auto`).
 - If you see libvirt permission errors on qcow2 files, set `POOL_PATH` to a
   system path like `/var/lib/libvirt/images/<lab>-pool`.
+  The scripts can auto-fix pool permissions when `LIBVIRT_POOL_FIX_PERMS=1`.
 
 2. Bootstrap host tools:
 

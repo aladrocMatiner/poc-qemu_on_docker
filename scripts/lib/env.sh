@@ -4,6 +4,7 @@ IFS=$'\n\t'
 
 log() { printf "%s\n" "[env] $*"; }
 err() { printf "%s\n" "[env][ERROR] $*"; }
+warn() { printf "%s\n" "[env][WARN] $*"; }
 
 load_env() {
   if [[ -f .env ]]; then
@@ -57,6 +58,52 @@ validate_network_env() {
       err "MGMT_NETWORK_CIDR is set but MGMT_NETWORK=default. Use a lab-specific network name to avoid clobbering the default network."
       return 1
     fi
+  fi
+}
+
+libvirt_qemu_user() {
+  local user=""
+  if [[ -f /etc/libvirt/qemu.conf ]]; then
+    user=$(sed -n 's/^[[:space:]]*user[[:space:]]*=[[:space:]]*"\\([^"]\\+\\)".*/\\1/p' /etc/libvirt/qemu.conf | head -n1)
+  fi
+  printf "%s" "${user:-libvirt-qemu}"
+}
+
+libvirt_qemu_group() {
+  local group=""
+  if [[ -f /etc/libvirt/qemu.conf ]]; then
+    group=$(sed -n 's/^[[:space:]]*group[[:space:]]*=[[:space:]]*"\\([^"]\\+\\)".*/\\1/p' /etc/libvirt/qemu.conf | head -n1)
+  fi
+  printf "%s" "${group:-kvm}"
+}
+
+ensure_libvirt_pool_permissions() {
+  local pool_path=$1
+  local fix=${LIBVIRT_POOL_FIX_PERMS:-1}
+  if [[ "${fix}" != "1" ]]; then
+    return 0
+  fi
+  if [[ -z "${pool_path}" || ! -d "${pool_path}" ]]; then
+    return 0
+  fi
+
+  local qemu_user qemu_group
+  qemu_user=$(libvirt_qemu_user)
+  qemu_group=$(libvirt_qemu_group)
+
+  if ! command -v sudo >/dev/null 2>&1; then
+    warn "sudo not available to fix pool permissions for ${pool_path}"
+    return 0
+  fi
+
+  if sudo -n true 2>/dev/null; then
+    if ! sudo -u "${qemu_user}" test -w "${pool_path}" 2>/dev/null; then
+      log "Fixing libvirt pool permissions for ${pool_path} (owner ${qemu_user}:${qemu_group})"
+      sudo chown -R "${qemu_user}:${qemu_group}" "${pool_path}" || true
+      sudo chmod -R u+rwX,g+rwX "${pool_path}" || true
+    fi
+  else
+    warn "Pool permissions may need fixing. Run: sudo chown -R ${qemu_user}:${qemu_group} ${pool_path} && sudo chmod -R u+rwX,g+rwX ${pool_path}"
   fi
 }
 
