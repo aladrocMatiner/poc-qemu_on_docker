@@ -1,0 +1,9 @@
+---
+- name: Phase 2 case02 down (remove windows stack)
+  hosts: swarm_managers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Remove windows stack
+      ansible.builtin.command: docker stack rm phase2-windows-vm
+      changed_when: false

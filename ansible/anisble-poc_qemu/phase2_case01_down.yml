@@ -1,0 +1,9 @@
+---
+- name: Phase 2 case01 down (remove linux usable stack)
+  hosts: swarm_managers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Remove linux usable stack
+      ansible.builtin.command: docker stack rm phase2-linux-usable
+      changed_when: false

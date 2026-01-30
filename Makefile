@@ -13,6 +13,8 @@ endif
 	ansible-bootstrap ansible-inventory ansible-ping ansible-baseline ansible-docker ansible-swarm ansible-verify ansible-swarm-status ansible-run \
 	ansible-swarm-poc-qemu-demo ansible-swarm-poc-qemu-linux ansible-swarm-poc-qemu-windows ansible-swarm-services \
 	ansible-swarm-poc-qemu-case00-up ansible-swarm-poc-qemu-case00-down \
+	ansible-swarm-poc-qemu-case01-up ansible-swarm-poc-qemu-case01-down \
+	ansible-swarm-poc-qemu-case02-up ansible-swarm-poc-qemu-case02-down \
 	ansible-all \
 	smoke smoke-idempotent test-matrix \
 	image-fetch image-verify image-info image-clean \
@@ -115,6 +117,18 @@ ansible-swarm-poc-qemu-case00-up:
 
 ansible-swarm-poc-qemu-case00-down:
 	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case00_down.yml
+
+ansible-swarm-poc-qemu-case01-up:
+	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_linux_usable.yml
+
+ansible-swarm-poc-qemu-case01-down:
+	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case01_down.yml
+
+ansible-swarm-poc-qemu-case02-up:
+	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_windows_vm.yml
+
+ansible-swarm-poc-qemu-case02-down:
+	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case02_down.yml
 
 ansible-all: lab-status ansible-bootstrap ansible-inventory ansible-ping ansible-baseline ansible-docker ansible-swarm ansible-verify
 
