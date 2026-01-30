@@ -42,4 +42,5 @@ if [[ "${ssh_target}" == Set* ]]; then
   exit 1
 fi
 
-exec ${ssh_target}
+IFS=' ' read -r -a cmd <<<"${ssh_target}"
+exec "${cmd[@]}"
