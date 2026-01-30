@@ -142,7 +142,7 @@ ansible-swarm-poc-qemu-case01-test:
 	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_case01_test.yml
 
 ansible-swarm-poc-qemu-case01-exec-list:
-	@STACK_NAME=phase2-linux-usable CASE_PREFIX=case01 ./scripts/swarm/exec_list.sh
+	@STACK_NAME=phase2-linux-usable CASE_PREFIX=case01 VM_RUNNER_SERVICE=phase2-linux-usable_vm-runner-linux ./scripts/swarm/exec_list.sh
 
 ansible-swarm-poc-qemu-case01-exec:
 	@STACK_NAME=phase2-linux-usable ./scripts/swarm/exec.sh $(if $(EXEC_NAME),$(EXEC_NAME),$(NAME))

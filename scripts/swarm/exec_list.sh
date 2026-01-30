@@ -14,6 +14,7 @@ SSH_USER=${SSH_USER:-ubuntu}
 SSH_KEY=${ANSIBLE_SSH_PRIVATE_KEY:-${SSH_PRIVATE_KEY:-}}
 STACK_NAME=${STACK_NAME:-phase2-linux-demo}
 CASE_PREFIX=${CASE_PREFIX:-case00}
+VM_RUNNER_SERVICE=${VM_RUNNER_SERVICE:-}
 
 if [[ ! -f "${INV_JSON}" ]]; then
   err "Missing ${INV_JSON}. Run: make lab-status"
@@ -22,6 +23,10 @@ fi
 
 svc_web="${STACK_NAME}_${CASE_PREFIX}-web"
 svc_ping="${STACK_NAME}_${CASE_PREFIX}-ping"
+services=("${svc_web}" "${svc_ping}")
+if [[ -n "${VM_RUNNER_SERVICE}" ]]; then
+  services+=("${VM_RUNNER_SERVICE}")
+fi
 
 ssh_opts=(
   -o BatchMode=yes
@@ -48,7 +53,7 @@ if ! \$DOCKER ps >/dev/null 2>&1; then
   fi
 fi
 HOST=$(hostname -s 2>/dev/null || hostname)
-for svc in "${svc_web}" "${svc_ping}"; do
+for svc in "${services[@]}"; do
   \$DOCKER ps --filter label=com.docker.swarm.service.name=\${svc} --format '{{.ID}} {{.Names}}' | while read -r id name; do
     if [[ -n "\${id}" ]]; then
       ip=\$(\$DOCKER inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "\${id}")
