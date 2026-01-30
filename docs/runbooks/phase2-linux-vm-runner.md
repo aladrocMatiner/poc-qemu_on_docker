@@ -9,6 +9,10 @@ Run a Linux VM inside a Swarm VM runner service and validate via Ansible.
 - `/dev/kvm` available on VM runner nodes
 - `LIBVIRT_CPU_MODE=host-passthrough` in `.env` (nested KVM in lab VMs)
 - DHCP reservations by MAC on the L2 network
+- VM runner assets present on all nodes:
+  - `/var/lib/vmrunner/images/linux.qcow2`
+  - `/var/lib/vmrunner/seeds/linux-seed.iso`
+  - `/var/lib/vmrunner/keys/id_ed25519` (private key for VM SSH)
 
 ## Procedure
 ```bash

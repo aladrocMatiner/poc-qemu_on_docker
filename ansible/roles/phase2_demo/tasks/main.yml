@@ -8,6 +8,36 @@
       - case_prefix | length > 0
     fail_msg: "stack_name, stack_src, and stack_dest are required for phase2_demo"
 
+- name: Build vm-runner host list
+  ansible.builtin.set_fact:
+    vmrunner_hosts: "{{ groups['swarm_all'] | default(groups['swarm_managers'] + groups['swarm_workers']) }}"
+  run_once: true
+
+- name: Ensure vm-runner host directories exist
+  ansible.builtin.file:
+    path: "{{ item.1 }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ vmrunner_hosts | product([ '/var/lib/vmrunner/images', '/var/lib/vmrunner/seeds', vm_runner_keys_dir_host | default('/var/lib/vmrunner/keys') ]) | list }}"
+  delegate_to: "{{ item.0 }}"
+  run_once: true
+
+- name: Check vm-runner key presence on nodes (warning only)
+  ansible.builtin.stat:
+    path: "{{ vm_runner_keys_dir_host | default('/var/lib/vmrunner/keys') }}/id_ed25519"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  register: vmrunner_key_stat
+  changed_when: false
+  failed_when: false
+  run_once: true
+
+- name: Warn if vm-runner key is missing on any node
+  ansible.builtin.debug:
+    msg: "VM runner key missing on: {{ (vmrunner_key_stat.results | selectattr('stat.exists', 'equalto', false) | map(attribute='item') | list) }}"
+  when: vmrunner_key_stat.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
+  run_once: true
+
 - name: Get swarm node list
   ansible.builtin.command: docker node ls --format '{{ "{{.Hostname}}" }}'
   register: swarm_nodes
