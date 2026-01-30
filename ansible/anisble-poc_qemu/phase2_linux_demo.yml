@@ -1,0 +1,9 @@
+---
+- name: Phase 2 Linux demo (placeholder)
+  hosts: swarm_all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Placeholder
+      ansible.builtin.fail:
+        msg: "Not implemented yet. This playbook will validate Swarm + normal service + Linux VM runner coexistence."

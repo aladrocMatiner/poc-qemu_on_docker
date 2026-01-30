@@ -1,0 +1,9 @@
+---
+- name: Phase 2 Linux usable VM (placeholder)
+  hosts: swarm_all
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Placeholder
+      ansible.builtin.fail:
+        msg: "Not implemented yet. This playbook will validate the reproducible Linux VM runner pipeline."
