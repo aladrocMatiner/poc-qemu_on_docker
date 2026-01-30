@@ -10,6 +10,8 @@ ROOT_DIR=$(cd "${SCRIPT_DIR}/../.." && pwd)
 load_env
 validate_network_env
 
+maybe_reexec_with_libvirt_group "$@"
+
 WORKDIR=${WORKDIR:-work}
 LIBVIRT_URI=${LIBVIRT_URI:-qemu:///system}
 SSH_USER=${SSH_USER:-ubuntu}

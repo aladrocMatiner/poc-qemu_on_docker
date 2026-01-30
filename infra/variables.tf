@@ -116,3 +116,15 @@ variable "libvirt_uri" {
   description = "Libvirt URI"
   default     = "qemu:///system"
 }
+
+variable "libvirt_qemu_user" {
+  type        = string
+  description = "Libvirt QEMU user for pool ownership fixes"
+  default     = "libvirt-qemu"
+}
+
+variable "libvirt_qemu_group" {
+  type        = string
+  description = "Libvirt QEMU group for pool ownership fixes"
+  default     = "kvm"
+}

@@ -21,6 +21,8 @@ module "swarm_lab" {
   downloads_dir     = var.downloads_dir
   pool_path         = var.pool_path
   libvirt_uri       = var.libvirt_uri
+  libvirt_qemu_user = var.libvirt_qemu_user
+  libvirt_qemu_group = var.libvirt_qemu_group
   libvirt_seclabel_mode = var.libvirt_seclabel_mode
   libvirt_cpu_mode  = var.libvirt_cpu_mode
 }

@@ -20,3 +20,5 @@ variable "pool_path" { type = string }
 variable "libvirt_uri" { type = string }
 variable "libvirt_seclabel_mode" { type = string }
 variable "libvirt_cpu_mode" { type = string }
+variable "libvirt_qemu_user" { type = string }
+variable "libvirt_qemu_group" { type = string }

@@ -8,6 +8,8 @@ SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 load_env
 
+maybe_reexec_with_libvirt_group "$@"
+
 LAB_NAME=${LAB_NAME:-swarm-lab}
 LIBVIRT_URI=${LIBVIRT_URI:-qemu:///system}
 WORKDIR=${WORKDIR:-work}

@@ -16,6 +16,8 @@ WORKDIR=${WORKDIR:-work}
 DOWNLOADS_DIR=${DOWNLOADS_DIR:-work/downloads}
 POOL_PATH=${POOL_PATH:-/var/lib/libvirt/images/${LAB_NAME:-swarm-lab}-pool}
 
+maybe_reexec_with_libvirt_group "$@"
+
 abs_path() {
   local path=$1
   if [[ "${path}" = /* ]]; then
@@ -52,17 +54,22 @@ export TF_VAR_downloads_dir="${DOWNLOADS_DIR}"
 export TF_VAR_pool_path="${POOL_PATH}"
 export TF_VAR_libvirt_uri="${LIBVIRT_URI:-qemu:///system}"
 export TF_VAR_libvirt_cpu_mode="${LIBVIRT_CPU_MODE:-host-passthrough}"
+export TF_VAR_libvirt_qemu_user="$(libvirt_qemu_user)"
+export TF_VAR_libvirt_qemu_group="$(libvirt_qemu_group)"
 
 seclabel_mode=${LIBVIRT_SECLABEL_MODE:-auto}
 if [[ "${seclabel_mode}" == "auto" ]]; then
   if command -v virsh >/dev/null 2>&1; then
     if virsh -c "${TF_VAR_libvirt_uri}" domcapabilities 2>/dev/null | grep -q "<model>apparmor</model>"; then
       seclabel_mode="apparmor"
+    fi
+  fi
+  if [[ "${seclabel_mode}" != "apparmor" ]]; then
+    if [[ -d /sys/kernel/security/apparmor ]] || command -v aa-status >/dev/null 2>&1 || command -v apparmor_status >/dev/null 2>&1; then
+      seclabel_mode="apparmor"
     else
       seclabel_mode="none"
     fi
-  else
-    seclabel_mode="none"
   fi
 fi
 export TF_VAR_libvirt_seclabel_mode="${seclabel_mode}"

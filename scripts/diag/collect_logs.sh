@@ -9,6 +9,8 @@ ROOT_DIR=$(cd "${SCRIPT_DIR}/../.." && pwd)
 . "${ROOT_DIR}/scripts/lib/env.sh"
 load_env
 
+maybe_reexec_with_libvirt_group "$@"
+
 WORKDIR=${WORKDIR:-work}
 ARTIFACT_DIR="${WORKDIR}/artifacts"
 TS=$(date +%Y%m%d-%H%M%S)

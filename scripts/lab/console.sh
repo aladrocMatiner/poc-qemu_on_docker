@@ -8,6 +8,8 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
 
 load_env
 
+maybe_reexec_with_libvirt_group "$@"
+
 NODE_INDEX=${NODE:-}
 if [[ -z "${NODE_INDEX}" ]]; then
   echo "[lab-console][ERROR] NODE is required (e.g., make lab-console NODE=1)"

@@ -47,6 +47,34 @@ resource "libvirt_cloudinit_disk" "cloudinit" {
   })
 }
 
+resource "null_resource" "pool_permissions" {
+  triggers = {
+    pool_path = var.pool_path
+    qemu_user = var.libvirt_qemu_user
+    qemu_group = var.libvirt_qemu_group
+    base_id   = libvirt_volume.base.id
+    disk_ids  = join(",", libvirt_volume.disk[*].id)
+  }
+
+  provisioner "local-exec" {
+    interpreter = ["/usr/bin/env", "bash", "-c"]
+    command = <<-EOT
+      if command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+        sudo chown -R "${var.libvirt_qemu_user}:${var.libvirt_qemu_group}" "${var.pool_path}" || true
+        sudo chmod -R u+rwX,g+rwX "${var.pool_path}" || true
+      else
+        echo "[warn] sudo not available to fix libvirt pool permissions: ${var.pool_path}"
+      fi
+    EOT
+  }
+
+  depends_on = [
+    libvirt_volume.base,
+    libvirt_volume.disk,
+    libvirt_cloudinit_disk.cloudinit,
+  ]
+}
+
 resource "libvirt_network" "mgmt" {
   count     = local.mgmt_network_enabled ? 1 : 0
   name      = var.mgmt_network
@@ -98,7 +126,7 @@ resource "libvirt_domain" "node" {
     target_port = "0"
   }
 
-  depends_on = [libvirt_network.mgmt]
+  depends_on = [libvirt_network.mgmt, null_resource.pool_permissions]
 
   network_interface {
     mac          = local.nodes[count.index].mgmt_mac
