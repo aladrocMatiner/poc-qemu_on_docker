@@ -38,18 +38,24 @@ found_node=""
 found_ip=""
 found_id=""
 
-jq -r '.nodes[] | select(.mgmt_ip) | "\(.name)|\(.mgmt_ip)"' "${INV_JSON}" | while IFS='|' read -r node ip; do
-  cid=$(ssh "${ssh_opts[@]}" "${SSH_USER}@${ip}" bash -s <<EOF_REMOTE || true
+while IFS='|' read -r node ip; do
+  cid=$(ssh "${ssh_opts[@]}" "${SSH_USER}@${ip}" "CONTAINER_NAME='${CONTAINER_NAME}' bash -s" <<'EOF_REMOTE' || true
 set -euo pipefail
-DOCKER=docker
-if ! \$DOCKER ps >/dev/null 2>&1; then
-  if sudo -n docker ps >/dev/null 2>&1; then
-    DOCKER="sudo -n docker"
-  else
-    exit 0
+docker_cmd=()
+if sudo -n docker ps >/dev/null 2>&1; then
+  docker_cmd=(sudo -n docker)
+elif docker ps >/dev/null 2>&1; then
+  docker_cmd=(docker)
+else
+  exit 0
+fi
+match=$("${docker_cmd[@]}" ps --filter "name=${CONTAINER_NAME}" --format '{{.ID}}' | head -n1)
+if [[ -z "${match}" ]]; then
+  base_name="${CONTAINER_NAME%.*}"
+  if [[ "${base_name}" != "${CONTAINER_NAME}" ]]; then
+    match=$("${docker_cmd[@]}" ps --filter "name=${base_name}" --format '{{.ID}}' | head -n1)
   fi
 fi
-match=$(\$DOCKER ps --format '{{.Names}} {{.ID}}' | awk -v n="${CONTAINER_NAME}" '$1==n {print $2; exit}')
 if [[ -n "${match}" ]]; then
   echo "${match}"
 fi
@@ -61,7 +67,7 @@ EOF_REMOTE
     found_id="${cid}"
     break
   fi
-done
+done < <(jq -r '.nodes[] | select(.mgmt_ip) | "\(.name)|\(.mgmt_ip)"' "${INV_JSON}")
 
 if [[ -z "${found_id}" ]]; then
   err "Container not found: ${CONTAINER_NAME}. Run: make ansible-swarm-poc-qemu-case00-exec-list"
@@ -69,4 +75,8 @@ if [[ -z "${found_id}" ]]; then
 fi
 
 log "Connecting to ${CONTAINER_NAME} on ${found_node} (${found_ip})"
-ssh -t "${ssh_opts[@]}" "${SSH_USER}@${found_ip}" "docker ps >/dev/null 2>&1 || sudo -n docker ps >/dev/null 2>&1; if docker ps >/dev/null 2>&1; then docker exec -it ${found_id} ${EXEC_SHELL}; else sudo -n docker exec -it ${found_id} ${EXEC_SHELL}; fi"
+if [[ -t 0 ]]; then
+  ssh -t "${ssh_opts[@]}" "${SSH_USER}@${found_ip}" "docker ps >/dev/null 2>&1 || sudo -n docker ps >/dev/null 2>&1; if docker ps >/dev/null 2>&1; then docker exec -it ${found_id} ${EXEC_SHELL}; else sudo -n docker exec -it ${found_id} ${EXEC_SHELL}; fi"
+else
+  ssh "${ssh_opts[@]}" "${SSH_USER}@${found_ip}" "docker ps >/dev/null 2>&1 || sudo -n docker ps >/dev/null 2>&1; if docker ps >/dev/null 2>&1; then docker exec -i ${found_id} ${EXEC_SHELL}; else sudo -n docker exec -i ${found_id} ${EXEC_SHELL}; fi"
+fi

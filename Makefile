@@ -124,8 +124,13 @@ ansible-swarm-poc-qemu-case00-test:
 ansible-swarm-poc-qemu-case00-exec-list:
 	@./scripts/swarm/exec_list.sh
 
+ifneq (,$(filter ansible-swarm-poc-qemu-case00-exec,$(MAKECMDGOALS)))
+EXEC_NAME := $(wordlist 2,2,$(MAKECMDGOALS))
+$(eval $(EXEC_NAME):;@:)
+endif
+
 ansible-swarm-poc-qemu-case00-exec:
-	@./scripts/swarm/exec.sh $(NAME)
+	@./scripts/swarm/exec.sh $(if $(EXEC_NAME),$(EXEC_NAME),$(NAME))
 
 ansible-swarm-poc-qemu-case01-up:
 	@./scripts/ansible/run.sh ansible/anisble-poc_qemu/phase2_linux_usable.yml

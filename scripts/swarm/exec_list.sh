@@ -31,7 +31,11 @@ if [[ -n "${SSH_KEY}" && -f "${SSH_KEY}" ]]; then
 fi
 
 jq -r '.nodes[] | select(.mgmt_ip) | "\(.name)|\(.mgmt_ip)"' "${INV_JSON}" | while IFS='|' read -r node ip; do
-  ssh "${ssh_opts[@]}" "${SSH_USER}@${ip}" bash -s <<EOF_REMOTE || true
+  if [[ -z "${printed_header:-}" ]]; then
+    printf "%-64s %-20s %-15s %s\n" "CONTAINER" "NODE" "IP" "SERVICE"
+    printed_header=1
+  fi
+  out=$(ssh "${ssh_opts[@]}" "${SSH_USER}@${ip}" bash -s <<EOF_REMOTE || true
 set -euo pipefail
 DOCKER=docker
 if ! \$DOCKER ps >/dev/null 2>&1; then
@@ -47,9 +51,15 @@ for svc in "${svc_web}" "${svc_ping}"; do
   \$DOCKER ps --filter label=com.docker.swarm.service.name=\${svc} --format '{{.ID}} {{.Names}}' | while read -r id name; do
     if [[ -n "\${id}" ]]; then
       ip=\$(\$DOCKER inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "\${id}")
-      printf "%s %s %s %s\\n" "\${name}" "\${HOST}" "\${ip}" "\${svc}"
+      printf "%s %s %s\\n" "\${name}" "\${ip}" "\${svc}"
     fi
   done
 done
 EOF_REMOTE
+)
+  if [[ -n "${out}" ]]; then
+    while IFS=' ' read -r name ipaddr svc; do
+      printf "%-64s %-20s %-15s %s\n" "${name}" "${node}" "${ipaddr}" "${svc}"
+    done <<<"${out}"
+  fi
 done
