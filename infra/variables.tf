@@ -57,6 +57,12 @@ variable "swarm_bridge" {
   description = "Host bridge name for swarm NIC"
 }
 
+variable "libvirt_seclabel_mode" {
+  type        = string
+  description = "Libvirt seclabel mode (auto|apparmor|none)"
+  default     = "auto"
+}
+
 variable "mac_prefix" {
   type        = string
   description = "MAC prefix (first 5 octets)"

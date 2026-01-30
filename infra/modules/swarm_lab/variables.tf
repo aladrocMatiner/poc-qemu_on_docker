@@ -18,3 +18,4 @@ variable "base_image_name" { type = string }
 variable "downloads_dir" { type = string }
 variable "pool_path" { type = string }
 variable "libvirt_uri" { type = string }
+variable "libvirt_seclabel_mode" { type = string }

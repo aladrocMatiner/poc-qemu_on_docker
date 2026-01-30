@@ -51,6 +51,16 @@ export TF_VAR_downloads_dir="${DOWNLOADS_DIR}"
 export TF_VAR_pool_path="${POOL_PATH}"
 export TF_VAR_libvirt_uri="${LIBVIRT_URI:-qemu:///system}"
 
+seclabel_mode=${LIBVIRT_SECLABEL_MODE:-auto}
+if [[ "${seclabel_mode}" == "auto" ]]; then
+  if [[ -d /sys/module/apparmor ]]; then
+    seclabel_mode="apparmor"
+  else
+    seclabel_mode="none"
+  fi
+fi
+export TF_VAR_libvirt_seclabel_mode="${seclabel_mode}"
+
 if [[ ! -d "${INFRA_DIR}" ]]; then
   err "INFRA_DIR not found: ${INFRA_DIR}"
   exit 1

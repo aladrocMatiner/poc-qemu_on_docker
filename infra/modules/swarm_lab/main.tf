@@ -8,6 +8,7 @@ locals {
     swarm_mac = format("%s:%02x", var.mac_prefix, var.mac_offset_swarm + i + 1)
     mgmt_ip   = local.mgmt_network_enabled ? cidrhost(var.mgmt_network_cidr, var.mgmt_ip_start + i) : null
   }]
+  seclabel_enabled = var.libvirt_seclabel_mode == "apparmor"
 }
 
 resource "libvirt_pool" "lab" {
@@ -72,8 +73,11 @@ resource "libvirt_domain" "node" {
   name   = "${var.lab_name}-node${count.index + 1}"
   vcpu   = var.vm_cpu
   memory = var.vm_ram_mb
-  xml {
-    xslt = file("${path.module}/domain-seclabel-none.xslt")
+  dynamic "xml" {
+    for_each = local.seclabel_enabled ? [1] : []
+    content {
+      xslt = file("${path.module}/domain-seclabel-none.xslt")
+    }
   }
 
   disk {
