@@ -19,6 +19,27 @@ $ make ansible-swarm-poc-qemu-demo
 $ make ansible-swarm-poc-qemu-linux
 $ make ansible-swarm-poc-qemu-windows
 ```
+
+Case-based shortcuts (up/down):
+
+Case 00: demo stack (normal services + Linux VM runner)
+```bash
+$ make ansible-swarm-poc-qemu-case00-up
+$ make ansible-swarm-poc-qemu-case00-down
+```
+
+Case 01: Linux VM runner (usable pipeline)
+```bash
+$ make ansible-swarm-poc-qemu-case01-up
+$ make ansible-swarm-poc-qemu-case01-down
+```
+
+Case 02: Windows VM runner
+```bash
+$ make ansible-swarm-poc-qemu-case02-up
+$ make ansible-swarm-poc-qemu-case02-down
+```
+
 Roles used by Phase 2 playbooks:
 - `roles/swarm_stack`
 - `roles/swarm_stack_status`
