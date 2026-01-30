@@ -3,6 +3,12 @@
   ansible.builtin.hostname:
     name: "{{ inventory_hostname }}"
 
+- name: Update apt cache (Debian/Ubuntu)
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_facts.os_family == "Debian"
+
 - name: Select package list
   ansible.builtin.set_fact:
     common_packages: "{{ common_packages_debian if ansible_facts.os_family == 'Debian' else common_packages_redhat }}"
