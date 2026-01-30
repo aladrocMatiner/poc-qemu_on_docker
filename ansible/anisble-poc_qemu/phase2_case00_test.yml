@@ -8,6 +8,18 @@
     svc_web: "{{ stack_name }}_case00-web"
     svc_ping: "{{ stack_name }}_case00-ping"
   tasks:
+    - name: Ensure case00 services exist
+      ansible.builtin.command: docker service ls --format '{{ "{{.Name}}" }}'
+      register: svc_names
+      changed_when: false
+
+    - name: Assert case00 services are present
+      ansible.builtin.assert:
+        that:
+          - svc_web in svc_names.stdout_lines
+          - svc_ping in svc_names.stdout_lines
+        fail_msg: "Missing case00 services. Run case00 up first."
+
     - name: Get node for case00-ping task
       ansible.builtin.command: >
         docker service ps {{ svc_ping }}
@@ -47,3 +59,35 @@
     - name: Show ping result
       ansible.builtin.debug:
         msg: "case00-ping -> case00-web: {{ ping_result.stdout | default('') }}"
+
+    - name: Get node for case00-web task
+      ansible.builtin.command: >
+        docker service ps {{ svc_web }}
+        --filter desired-state=running
+        --format '{{ "{{.Node}}" }}'
+      register: web_nodes
+      changed_when: false
+
+    - name: Ensure case00-web task is running
+      ansible.builtin.assert:
+        that:
+          - web_nodes.stdout_lines | length > 0
+        fail_msg: "case00-web has no running tasks."
+
+    - name: Ensure services are on different nodes
+      ansible.builtin.assert:
+        that:
+          - ping_nodes.stdout_lines[0] != web_nodes.stdout_lines[0]
+        fail_msg: "case00 services are on the same node."
+
+    - name: Reverse ping from web node using ephemeral tester
+      ansible.builtin.command: >
+        docker run --rm --network demo-net busybox:1.36
+        ping -c 1 case00-ping
+      register: reverse_ping
+      changed_when: false
+      delegate_to: "{{ web_nodes.stdout_lines[0] }}"
+
+    - name: Show reverse ping result
+      ansible.builtin.debug:
+        msg: "case00-web-node -> case00-ping: {{ reverse_ping.stdout | default('') }}"
