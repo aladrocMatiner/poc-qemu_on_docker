@@ -63,18 +63,29 @@ validate_network_env() {
 
 libvirt_qemu_user() {
   local user=""
-  if [[ -f /etc/libvirt/qemu.conf ]]; then
-    user=$(sed -n 's/^[[:space:]]*user[[:space:]]*=[[:space:]]*"\\([^"]\\+\\)".*/\\1/p' /etc/libvirt/qemu.conf | head -n1)
-  fi
+  user=$(read_qemu_conf_value "user")
   printf "%s" "${user:-libvirt-qemu}"
 }
 
 libvirt_qemu_group() {
   local group=""
-  if [[ -f /etc/libvirt/qemu.conf ]]; then
-    group=$(sed -n 's/^[[:space:]]*group[[:space:]]*=[[:space:]]*"\\([^"]\\+\\)".*/\\1/p' /etc/libvirt/qemu.conf | head -n1)
-  fi
+  group=$(read_qemu_conf_value "group")
   printf "%s" "${group:-kvm}"
+}
+
+read_qemu_conf_value() {
+  local key=$1
+  local conf="/etc/libvirt/qemu.conf"
+  local value=""
+  local pattern="s/^[[:space:]]*${key}[[:space:]]*=[[:space:]]*\"\\([^\"]\\+\\)\".*/\\1/p"
+
+  if [[ -r "${conf}" ]]; then
+    value=$(sed -n "${pattern}" "${conf}" | head -n1)
+  elif command -v sudo >/dev/null 2>&1 && sudo -n true 2>/dev/null; then
+    value=$(sudo sed -n "${pattern}" "${conf}" | head -n1)
+  fi
+
+  printf "%s" "${value}"
 }
 
 ensure_libvirt_pool_permissions() {
@@ -83,7 +94,7 @@ ensure_libvirt_pool_permissions() {
   if [[ "${fix}" != "1" ]]; then
     return 0
   fi
-  if [[ -z "${pool_path}" || ! -d "${pool_path}" ]]; then
+  if [[ -z "${pool_path}" ]]; then
     return 0
   fi
 
@@ -97,6 +108,10 @@ ensure_libvirt_pool_permissions() {
   fi
 
   if sudo -n true 2>/dev/null; then
+    if [[ ! -d "${pool_path}" ]]; then
+      log "Creating libvirt pool path ${pool_path} (owner ${qemu_user}:${qemu_group})"
+      sudo install -d -o "${qemu_user}" -g "${qemu_group}" -m 0770 "${pool_path}"
+    fi
     if ! sudo -u "${qemu_user}" test -w "${pool_path}" 2>/dev/null; then
       log "Fixing libvirt pool permissions for ${pool_path} (owner ${qemu_user}:${qemu_group})"
       sudo chown -R "${qemu_user}:${qemu_group}" "${pool_path}" || true
