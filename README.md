@@ -32,6 +32,7 @@ If bootstrap adds you to `libvirt`, `kvm`, or `docker` groups, log out/in to app
 
 ```bash
 $ make lab-init
+$ make image-fetch
 $ make lab-up
 ```
 

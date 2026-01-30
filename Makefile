@@ -12,6 +12,7 @@ endif
 	lab-init lab-up lab-destroy lab-status lab-console \
 	ansible-bootstrap ansible-inventory ansible-ping ansible-baseline ansible-docker ansible-swarm ansible-verify ansible-run \
 	smoke smoke-idempotent test-matrix \
+	image-fetch image-verify image-info image-clean \
 	host-network-setup collect-logs \
 	doctor clean reset lab-snapshot lab-restore
 
@@ -43,6 +44,18 @@ tofu-output:
 	@./scripts/tofu/run.sh output
 
 lab-init: prereqs-check tofu-init
+
+image-fetch:
+	@./scripts/images/fetch.sh
+
+image-verify:
+	@./scripts/images/verify.sh
+
+image-info:
+	@./scripts/images/info.sh
+
+image-clean:
+	@./scripts/images/clean.sh
 
 lab-up: tofu-apply
 
