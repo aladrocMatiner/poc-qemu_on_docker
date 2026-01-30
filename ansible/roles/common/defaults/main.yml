@@ -4,6 +4,7 @@ common_packages_debian:
   - ca-certificates
   - jq
   - iproute2
+  - libvirt-clients
   - rsync
 
 common_packages_redhat:
@@ -11,6 +12,7 @@ common_packages_redhat:
   - ca-certificates
   - jq
   - iproute
+  - libvirt-client
   - rsync
 
 common_timesync_package: chrony
