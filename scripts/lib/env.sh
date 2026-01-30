@@ -7,10 +7,18 @@ err() { printf "%s\n" "[env][ERROR] $*"; }
 
 load_env() {
   if [[ -f .env ]]; then
-    set -a
-    # shellcheck disable=SC1091
-    . ./.env
-    set +a
+    while IFS= read -r line || [[ -n "$line" ]]; do
+      [[ -z "${line}" ]] && continue
+      [[ "${line}" =~ ^[[:space:]]*# ]] && continue
+      # Support optional "export " prefix.
+      line="${line#export }"
+      if [[ "${line}" =~ ^([A-Za-z_][A-Za-z0-9_]*)=(.*)$ ]]; then
+        local key=${BASH_REMATCH[1]}
+        if [[ -z "${!key-}" ]]; then
+          export "${line}"
+        fi
+      fi
+    done < ./.env
   fi
 }
 
