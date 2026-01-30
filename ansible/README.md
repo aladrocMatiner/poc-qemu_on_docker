@@ -22,7 +22,7 @@ $ make ansible-swarm-poc-qemu-windows
 
 Case-based shortcuts (up/down):
 
-Case 00: demo stack (normal services + Linux VM runner)
+Case 00: vanilla services (two normal containers on different nodes)
 ```bash
 $ make ansible-swarm-poc-qemu-case00-up
 $ make ansible-swarm-poc-qemu-case00-down

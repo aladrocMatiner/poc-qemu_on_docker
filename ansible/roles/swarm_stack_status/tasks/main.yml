@@ -11,25 +11,25 @@
   failed_when: service_tasks.stdout_lines | length < 1
   loop: "{{ stack_services.stdout_lines }}"
 
-- name: Capture demo-ping task id (if present)
-  ansible.builtin.command: docker service ps --filter desired-state=running --format '{{ "{{.ID}}" }}' {{ stack_name }}_demo-ping
-  register: demo_ping_task
+- name: Capture demo-ping container id (if present)
+  ansible.builtin.command: docker ps --filter label=com.docker.swarm.service.name={{ stack_name }}_demo-ping --format '{{ "{{.ID}}" }}'
+  register: demo_ping_container
   changed_when: false
   failed_when: false
 
 - name: Inspect demo-ping network names
-  ansible.builtin.command: docker inspect --format '{{ "{{ range $k, $v := .NetworksAttachments }}{{ $v.Network.Spec.Name }} {{ end }}" }}' {{ demo_ping_task.stdout_lines[0] }}
+  ansible.builtin.command: docker inspect --format '{{ "{{ range $k, $v := .NetworkSettings.Networks }}{{ $k }} {{ end }}" }}' {{ demo_ping_container.stdout_lines[0] }}
   register: demo_ping_networks
   changed_when: false
   failed_when: false
-  when: demo_ping_task.stdout_lines | length > 0
+  when: demo_ping_container.stdout_lines | length > 0
 
 - name: Check demo-ping can resolve and ping demo-web
-  ansible.builtin.command: docker exec {{ demo_ping_task.stdout_lines[0] }} ping -c 1 demo-web
+  ansible.builtin.command: docker exec {{ demo_ping_container.stdout_lines[0] }} ping -c 1 demo-web
   register: demo_ping
   changed_when: false
   failed_when: false
-  when: demo_ping_task.stdout_lines | length > 0
+  when: demo_ping_container.stdout_lines | length > 0
 
 - name: Report demo-ping result
   ansible.builtin.debug:
@@ -37,4 +37,21 @@
       - "demo-ping networks: {{ demo_ping_networks.stdout | default('n/a') }}"
       - "demo-ping result: {{ demo_ping.stdout | default('n/a') }}"
       - "demo-ping rc: {{ demo_ping.rc | default('n/a') }}"
-  when: demo_ping_task.stdout_lines | length > 0
+  when: demo_ping_container.stdout_lines | length > 0
+
+- name: Capture demo service nodes
+  ansible.builtin.command: docker service ps --filter desired-state=running --format '{{ "{{.Node}}" }}' {{ item }}
+  register: demo_service_nodes
+  changed_when: false
+  loop:
+    - "{{ stack_name }}_demo-web"
+    - "{{ stack_name }}_demo-ping"
+
+- name: Ensure demo services run on different nodes
+  ansible.builtin.assert:
+    that:
+      - demo_service_nodes.results[0].stdout_lines | length > 0
+      - demo_service_nodes.results[1].stdout_lines | length > 0
+      - demo_service_nodes.results[0].stdout_lines[0] != demo_service_nodes.results[1].stdout_lines[0]
+    fail_msg: "demo-web and demo-ping must be on different nodes (check case00 labels)."
+  when: demo_service_nodes.results | length == 2

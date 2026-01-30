@@ -5,13 +5,18 @@ Demonstrate that a Swarm cluster can run normal container services and VM runner
 
 ## Demos / Cases
 
-### Case 00: Demo (normal services + Linux VM runner)
-- Purpose: show coexistence of normal services and a Linux VM runner.
+### Case 00: Vanilla services (two normal containers)
+- Purpose: prove Swarm can run two normal services on different nodes and they can ping each other over the same overlay network.
 - Stack: `stacks/phase2-linux-demo.yml`
 - Ansible:
 ```bash
 make ansible-swarm-poc-qemu-case00-up
 make ansible-swarm-poc-qemu-case00-down
+```
+Required labels (one node each):
+```bash
+docker node update --label-add case00-web=true <nodeA>
+docker node update --label-add case00-ping=true <nodeB>
 ```
 
 ### Case 01: Linux VM runner (usable pipeline)

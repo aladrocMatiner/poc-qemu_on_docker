@@ -88,7 +88,7 @@ $ make doctor       # environment + toolchain checks
 
 Phase 2 runs Swarm services that include VM runner containers (Linux first, then Windows).
 
-Case 00: demo stack (normal services + Linux VM runner)
+Case 00: vanilla services (two normal containers on different nodes)
 ```bash
 $ make ansible-swarm-poc-qemu-case00-up
 $ make ansible-swarm-poc-qemu-case00-down
