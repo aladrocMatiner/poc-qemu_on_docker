@@ -11,8 +11,8 @@
   failed_when: service_tasks.stdout_lines | length < 1
   loop: "{{ stack_services.stdout_lines }}"
 
-- name: Capture demo-ping container id (if present)
-  ansible.builtin.command: docker ps --filter label=com.docker.swarm.service.name={{ stack_name }}_demo-ping --format '{{ "{{.ID}}" }}'
+- name: Capture case00-ping container id (if present)
+  ansible.builtin.command: docker ps --filter label=com.docker.swarm.service.name={{ stack_name }}_case00-ping --format '{{ "{{.ID}}" }}'
   register: demo_ping_container
   changed_when: false
   failed_when: false
@@ -24,8 +24,8 @@
   failed_when: false
   when: demo_ping_container.stdout_lines | length > 0
 
-- name: Check demo-ping can resolve and ping demo-web
-  ansible.builtin.command: docker exec {{ demo_ping_container.stdout_lines[0] }} ping -c 1 demo-web
+- name: Check case00-ping can resolve and ping case00-web
+  ansible.builtin.command: docker exec {{ demo_ping_container.stdout_lines[0] }} ping -c 1 case00-web
   register: demo_ping
   changed_when: false
   failed_when: false
@@ -39,19 +39,19 @@
       - "demo-ping rc: {{ demo_ping.rc | default('n/a') }}"
   when: demo_ping_container.stdout_lines | length > 0
 
-- name: Capture demo service nodes
+- name: Capture case00 service nodes
   ansible.builtin.command: docker service ps --filter desired-state=running --format '{{ "{{.Node}}" }}' {{ item }}
   register: demo_service_nodes
   changed_when: false
   loop:
-    - "{{ stack_name }}_demo-web"
-    - "{{ stack_name }}_demo-ping"
+    - "{{ stack_name }}_case00-web"
+    - "{{ stack_name }}_case00-ping"
 
-- name: Ensure demo services run on different nodes
+- name: Ensure case00 services run on different nodes
   ansible.builtin.assert:
     that:
       - demo_service_nodes.results[0].stdout_lines | length > 0
       - demo_service_nodes.results[1].stdout_lines | length > 0
       - demo_service_nodes.results[0].stdout_lines[0] != demo_service_nodes.results[1].stdout_lines[0]
-    fail_msg: "demo-web and demo-ping must be on different nodes (check case00 labels)."
+    fail_msg: "case00-web and case00-ping must be on different nodes (check case00 labels)."
   when: demo_service_nodes.results | length == 2
