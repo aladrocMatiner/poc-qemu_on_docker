@@ -4,11 +4,29 @@
   become: true
   gather_facts: false
   tasks:
-    - name: List services
+    - name: List services (summary)
       ansible.builtin.command: docker service ls --format '{{ "{{.Name}} {{.Mode}} {{.Replicas}} {{.Image}}" }}'
       register: svc_list
       changed_when: false
 
-    - name: Print services
+    - name: List service names
+      ansible.builtin.command: docker service ls --format '{{ "{{.Name}}" }}'
+      register: svc_names
+      changed_when: false
+
+    - name: Print services (summary)
       ansible.builtin.debug:
         msg: "{{ svc_list.stdout_lines | default([]) }}"
+
+    - name: Service tasks with node placement
+      ansible.builtin.command: >
+        docker service ps {{ item }}
+        --format '{{ "{{.Name}}|{{.Node}}|{{.CurrentState}}|{{.Error}}" }}'
+      loop: "{{ svc_names.stdout_lines | default([]) }}"
+      register: svc_tasks
+      changed_when: false
+
+    - name: Print service tasks (node placement)
+      ansible.builtin.debug:
+        msg: "{{ item.stdout_lines | default([]) }}"
+      loop: "{{ svc_tasks.results | default([]) }}"

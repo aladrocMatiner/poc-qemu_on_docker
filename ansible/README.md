@@ -25,6 +25,7 @@ Case-based shortcuts (up/down):
 Case 00: vanilla services (two normal containers on different nodes)
 ```bash
 $ make ansible-swarm-poc-qemu-case00-up
+$ make ansible-swarm-poc-qemu-case00-test
 $ make ansible-swarm-poc-qemu-case00-down
 ```
 

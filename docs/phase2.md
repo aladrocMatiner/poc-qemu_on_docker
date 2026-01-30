@@ -12,11 +12,11 @@ Demonstrate that a Swarm cluster can run normal container services and VM runner
 ```bash
 make ansible-swarm-poc-qemu-case00-up
 make ansible-swarm-poc-qemu-case00-down
+make ansible-swarm-poc-qemu-case00-test
 ```
 Required labels (one node each):
 ```bash
-docker node update --label-add case00-web=true <nodeA>
-docker node update --label-add case00-ping=true <nodeB>
+case00 placement is now automatic (random distinct nodes) during case00 up.
 ```
 
 ### Case 01: Linux VM runner (usable pipeline)

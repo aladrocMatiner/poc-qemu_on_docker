@@ -7,17 +7,49 @@
       - stack_dest | length > 0
     fail_msg: "stack_name, stack_src, and stack_dest are required for phase2_demo"
 
-- name: Get node labels
-  ansible.builtin.command: docker node ls --format '{{ "{{.Hostname}}" }}|{{ "{{.Labels}}" }}'
-  register: node_labels
+- name: Get swarm node list
+  ansible.builtin.command: docker node ls --format '{{ "{{.Hostname}}" }}'
+  register: swarm_nodes
   changed_when: false
+  run_once: true
 
-- name: Ensure case00 labels exist on at least two nodes
+- name: Ensure at least two nodes exist
   ansible.builtin.assert:
     that:
-      - node_labels.stdout is search('case00-web=true')
-      - node_labels.stdout is search('case00-ping=true')
-    fail_msg: "Missing case00 labels. Run: docker node update --label-add case00-web=true <nodeA> and case00-ping=true <nodeB>."
+      - swarm_nodes.stdout_lines | length >= 2
+    fail_msg: "Need at least two swarm nodes to place case00 services on different hosts."
+  run_once: true
+
+- name: Select two distinct nodes for case00 services
+  ansible.builtin.set_fact:
+    case00_nodes: "{{ swarm_nodes.stdout_lines | shuffle | list }}"
+  run_once: true
+
+- name: Clear existing case00 labels
+  ansible.builtin.command: docker node update --label-rm case00-web --label-rm case00-ping {{ item }}
+  loop: "{{ swarm_nodes.stdout_lines }}"
+  run_once: true
+  changed_when: false
+  failed_when: false
+
+- name: Apply case00 labels to two nodes
+  ansible.builtin.command: >
+    docker node update
+    --label-add case00-web=true
+    {{ case00_nodes[0] }}
+  run_once: true
+
+- name: Apply case00 labels to second node
+  ansible.builtin.command: >
+    docker node update
+    --label-add case00-ping=true
+    {{ case00_nodes[1] }}
+  run_once: true
+
+- name: Show case00 placement
+  ansible.builtin.debug:
+    msg: "case00-web -> {{ case00_nodes[0] }}, case00-ping -> {{ case00_nodes[1] }}"
+  run_once: true
 
 - name: Deploy demo stack
   ansible.builtin.import_role:

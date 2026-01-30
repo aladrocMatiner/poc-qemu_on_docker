@@ -1,0 +1,49 @@
+---
+- name: Phase 2 case00 test (ping between services)
+  hosts: swarm_managers
+  become: true
+  gather_facts: false
+  vars:
+    stack_name: phase2-linux-demo
+    svc_web: "{{ stack_name }}_case00-web"
+    svc_ping: "{{ stack_name }}_case00-ping"
+  tasks:
+    - name: Get node for case00-ping task
+      ansible.builtin.command: >
+        docker service ps {{ svc_ping }}
+        --filter desired-state=running
+        --format '{{ "{{.Node}}" }}'
+      register: ping_nodes
+      changed_when: false
+
+    - name: Ensure case00-ping task is running
+      ansible.builtin.assert:
+        that:
+          - ping_nodes.stdout_lines | length > 0
+        fail_msg: "case00-ping has no running tasks. Deploy case00 first."
+
+    - name: Resolve case00-ping container id on its node
+      ansible.builtin.command: >
+        docker ps --filter label=com.docker.swarm.service.name={{ svc_ping }}
+        --format '{{ "{{.ID}}" }}'
+      register: ping_container
+      changed_when: false
+      delegate_to: "{{ ping_nodes.stdout_lines[0] }}"
+
+    - name: Ensure case00-ping container exists
+      ansible.builtin.assert:
+        that:
+          - ping_container.stdout | length > 0
+        fail_msg: "case00-ping container not found on node {{ ping_nodes.stdout_lines[0] }}."
+
+    - name: Ping case00-web from case00-ping container
+      ansible.builtin.command: >
+        docker exec {{ ping_container.stdout }}
+        ping -c 1 case00-web
+      register: ping_result
+      changed_when: false
+      delegate_to: "{{ ping_nodes.stdout_lines[0] }}"
+
+    - name: Show ping result
+      ansible.builtin.debug:
+        msg: "case00-ping -> case00-web: {{ ping_result.stdout | default('') }}"

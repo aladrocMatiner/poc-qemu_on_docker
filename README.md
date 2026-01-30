@@ -91,6 +91,7 @@ Phase 2 runs Swarm services that include VM runner containers (Linux first, then
 Case 00: vanilla services (two normal containers on different nodes)
 ```bash
 $ make ansible-swarm-poc-qemu-case00-up
+$ make ansible-swarm-poc-qemu-case00-test
 $ make ansible-swarm-poc-qemu-case00-down
 ```
 
