@@ -1,0 +1,9 @@
+---
+- name: Phase 2 case00 down (remove demo stack)
+  hosts: swarm_managers
+  become: true
+  gather_facts: false
+  tasks:
+    - name: Remove demo stack
+      ansible.builtin.command: docker stack rm phase2-linux-demo
+      changed_when: false
