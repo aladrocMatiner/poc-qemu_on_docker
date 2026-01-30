@@ -59,7 +59,8 @@ image-clean:
 
 lab-up: tofu-apply
 
-lab-destroy: tofu-destroy
+lab-destroy:
+	@./scripts/lab/destroy.sh
 
 lab-status: tofu-output
 	@./scripts/tofu/inventory.sh
