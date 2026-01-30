@@ -37,6 +37,7 @@ Notes:
 - `case01-test` reuses the same connectivity checks as Case 00 against the normal services.
 - `case01-exec-list` and `case01-exec` work the same as Case 00 for service containers.
 - VM connectivity check uses SSH inside the vm-runner container to reach the guest via `127.0.0.1:2222`.
+- If `vm-runner-linux` stays Pending, ensure `LIBVIRT_CPU_MODE=host-passthrough` and re-create the lab.
 - Provide a private key at `${VM_RUNNER_KEYS_DIR_HOST}/id_ed25519` on the host (mounted to `${VM_RUNNER_KEYS_DIR_CONTAINER}` in the container).
 - `make ansible-swarm` auto-labels nodes `vm-capable=true` if `/dev/kvm` exists.
 

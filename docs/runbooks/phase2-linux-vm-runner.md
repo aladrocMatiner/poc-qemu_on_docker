@@ -7,6 +7,7 @@ Run a Linux VM inside a Swarm VM runner service and validate via Ansible.
 - Swarm cluster healthy
 - Nodes labeled `vm-capable=true`
 - `/dev/kvm` available on VM runner nodes
+- `LIBVIRT_CPU_MODE=host-passthrough` in `.env` (nested KVM in lab VMs)
 - DHCP reservations by MAC on the L2 network
 
 ## Procedure

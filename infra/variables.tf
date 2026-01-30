@@ -63,6 +63,12 @@ variable "libvirt_seclabel_mode" {
   default     = "auto"
 }
 
+variable "libvirt_cpu_mode" {
+  type        = string
+  description = "Libvirt CPU mode for nested virtualization (host-passthrough|host-model|none)"
+  default     = "host-passthrough"
+}
+
 variable "mac_prefix" {
   type        = string
   description = "MAC prefix (first 5 octets)"

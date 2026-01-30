@@ -8,6 +8,12 @@ Ensure the lab VMs can expose `/dev/kvm` so vm-runner containers can start QEMU/
 make nested-kvm-check
 ```
 
+Ensure the lab uses host CPU mode:
+```bash
+grep -E '^LIBVIRT_CPU_MODE=' .env
+```
+Expected: `LIBVIRT_CPU_MODE=host-passthrough`
+
 ## Symptoms
 - Swarm service `vm-runner-linux` stays in `Pending` with "no suitable node".
 - `make ansible-swarm` removes `vm-capable` labels because `/dev/kvm` is missing.

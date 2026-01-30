@@ -19,3 +19,4 @@ variable "downloads_dir" { type = string }
 variable "pool_path" { type = string }
 variable "libvirt_uri" { type = string }
 variable "libvirt_seclabel_mode" { type = string }
+variable "libvirt_cpu_mode" { type = string }

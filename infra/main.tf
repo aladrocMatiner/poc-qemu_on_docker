@@ -22,4 +22,5 @@ module "swarm_lab" {
   pool_path         = var.pool_path
   libvirt_uri       = var.libvirt_uri
   libvirt_seclabel_mode = var.libvirt_seclabel_mode
+  libvirt_cpu_mode  = var.libvirt_cpu_mode
 }

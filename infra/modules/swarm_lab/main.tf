@@ -73,6 +73,12 @@ resource "libvirt_domain" "node" {
   name   = "${var.lab_name}-node${count.index + 1}"
   vcpu   = var.vm_cpu
   memory = var.vm_ram_mb
+  dynamic "cpu" {
+    for_each = var.libvirt_cpu_mode != "none" ? [1] : []
+    content {
+      mode = var.libvirt_cpu_mode
+    }
+  }
   dynamic "xml" {
     for_each = local.seclabel_enabled ? [1] : []
     content {

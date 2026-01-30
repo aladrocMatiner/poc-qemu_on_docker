@@ -88,6 +88,7 @@ $ make doctor       # environment + toolchain checks
 
 Phase 2 runs Swarm services that include VM runner containers (Linux first, then Windows).
 If vm-runner services stay in Pending, check nested virtualization: `make nested-kvm-check`.
+Ensure `LIBVIRT_CPU_MODE=host-passthrough` so lab VMs expose `/dev/kvm`.
 
 Case 00: vanilla services (two normal containers on different nodes). Goal: validate overlay connectivity between services.
 ```bash

@@ -50,6 +50,7 @@ export TF_VAR_base_image_name="${BASE_IMAGE_NAME:-}"
 export TF_VAR_downloads_dir="${DOWNLOADS_DIR}"
 export TF_VAR_pool_path="${POOL_PATH}"
 export TF_VAR_libvirt_uri="${LIBVIRT_URI:-qemu:///system}"
+export TF_VAR_libvirt_cpu_mode="${LIBVIRT_CPU_MODE:-host-passthrough}"
 
 seclabel_mode=${LIBVIRT_SECLABEL_MODE:-auto}
 if [[ "${seclabel_mode}" == "auto" ]]; then
