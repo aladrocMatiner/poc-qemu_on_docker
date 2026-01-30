@@ -61,6 +61,7 @@ $ make ansible-baseline   # apply baseline OS configuration
 $ make ansible-docker     # install and enable Docker
 $ make ansible-swarm      # initialize/join Docker Swarm
 $ make ansible-verify     # verify Docker + Swarm state
+$ make ansible-swarm-status  # show swarm status from manager
 ```
 
 6. Optional smoke tests:
