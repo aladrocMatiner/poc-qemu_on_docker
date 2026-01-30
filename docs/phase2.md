@@ -53,3 +53,4 @@ make ansible-swarm-poc-qemu-case02-down
 - VM runner services must avoid `--privileged` and use `/dev/kvm` + minimal caps.
 - DHCP reservations are based on deterministic MACs.
 - All validation is executed via Ansible.
+- If vm-runner services are Pending, check nested virtualization on the host: `make nested-kvm-check`.

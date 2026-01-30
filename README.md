@@ -87,6 +87,7 @@ $ make doctor       # environment + toolchain checks
 ## Phase 2 (QEMU-in-Container PoC)
 
 Phase 2 runs Swarm services that include VM runner containers (Linux first, then Windows).
+If vm-runner services stay in Pending, check nested virtualization: `make nested-kvm-check`.
 
 Case 00: vanilla services (two normal containers on different nodes). Goal: validate overlay connectivity between services.
 ```bash
@@ -118,5 +119,6 @@ $ make ansible-swarm-poc-qemu-case02-down
 
 - `docs/runbooks/opentofu-libvirt.md`
 - `docs/runbooks/network-modes.md`
+- `docs/runbooks/nested-virtualization.md`
 - `docs/standards.md`
 - `docs/phase2.md`

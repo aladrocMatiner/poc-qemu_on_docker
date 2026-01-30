@@ -158,6 +158,9 @@ ansible-all: lab-status ansible-bootstrap ansible-inventory ansible-ping ansible
 ansible-run:
 	@./scripts/ansible/run.sh $(PLAYBOOK)
 
+nested-kvm-check:
+	@./scripts/tools/check_nested_kvm.sh
+
 host-network-setup:
 	@./scripts/host/network_setup.sh
 
