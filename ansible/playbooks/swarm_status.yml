@@ -6,7 +6,7 @@
 
   tasks:
     - name: Swarm local state (all nodes)
-      ansible.builtin.command: !unsafe docker info --format '{{.Swarm.LocalNodeState}} {{.Swarm.NodeID}}'
+      ansible.builtin.command: docker info --format '{{ "{{.Swarm.LocalNodeState}} {{.Swarm.NodeID}}" }}'
       register: swarm_local
       changed_when: false
       run_once: false
@@ -30,7 +30,7 @@
   gather_facts: false
   tasks:
     - name: Swarm node list
-      ansible.builtin.command: !unsafe docker node ls --format '{{.Hostname}} {{.Status}} {{.Availability}} {{.ManagerStatus}}'
+      ansible.builtin.command: docker node ls --format '{{ "{{.Hostname}} {{.Status}} {{.Availability}} {{.ManagerStatus}}" }}'
       register: swarm_nodes
       changed_when: false
 

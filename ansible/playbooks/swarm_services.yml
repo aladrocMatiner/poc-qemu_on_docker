@@ -5,7 +5,7 @@
   gather_facts: false
   tasks:
     - name: List services
-      ansible.builtin.command: !unsafe docker service ls --format '{{.Name}} {{.Mode}} {{.Replicas}} {{.Image}}'
+      ansible.builtin.command: docker service ls --format '{{ "{{.Name}} {{.Mode}} {{.Replicas}} {{.Image}}" }}'
       register: svc_list
       changed_when: false
 
