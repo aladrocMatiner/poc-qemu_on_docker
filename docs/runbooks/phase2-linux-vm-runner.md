@@ -13,11 +13,14 @@ Run a Linux VM inside a Swarm VM runner service and validate via Ansible.
   - `/var/lib/vmrunner/images/linux.qcow2`
   - `/var/lib/vmrunner/seeds/linux-seed.iso`
   - `/var/lib/vmrunner/keys/id_ed25519` (private key for VM SSH)
+- VM runner image built on each node from `images/vm-runner-linux/`.
 
 ## Procedure
 ```bash
 make ansible-swarm-poc-qemu-linux
 ```
+
+This will prepare VM runner assets on all nodes (keys, base image, qcow2, seed) if missing.
 
 Optional: provide VM IPs for validation checks:
 ```bash

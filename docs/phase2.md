@@ -24,6 +24,7 @@ Notes:
 
 ### Case 01: Linux VM runner (usable pipeline)
 - Purpose: same base overlay validation as Case 00, plus a Linux VM runner service in the stack.
+- The VM runner image is built on-demand from `images/vm-runner-linux/` if missing.
 - Stack: `stacks/phase2-linux-usable.yml`
 - Ansible:
 ```bash

@@ -2,11 +2,14 @@
 - name: Phase 2 Case 01 (normal services + Linux VM runner)
   hosts: swarm_managers
   become: true
-  gather_facts: false
+  gather_facts: true
   vars:
     stack_name: phase2-linux-usable
     stack_src: "{{ playbook_dir }}/../../stacks/phase2-linux-usable.yml"
     stack_dest: /tmp/phase2-linux-usable.yml
     case_prefix: case01
+    vm_runner_prepare_assets: true
+    vm_runner_linux_context_src: "{{ playbook_dir }}/../../images/vm-runner-linux"
+    vm_runner_image_rebuild: true
   roles:
     - phase2_demo

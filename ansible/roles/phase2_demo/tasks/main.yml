@@ -38,6 +38,213 @@
   when: vmrunner_key_stat.results | selectattr('stat.exists', 'equalto', false) | list | length > 0
   run_once: true
 
+- name: Generate vm-runner SSH key on manager if missing
+  ansible.builtin.command: >
+    ssh-keygen -t ed25519 -N '' -f {{ vm_runner_keys_dir_host | default('/var/lib/vmrunner/keys') }}/id_ed25519
+  args:
+    creates: "{{ vm_runner_keys_dir_host | default('/var/lib/vmrunner/keys') }}/id_ed25519"
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Read vm-runner public key from manager
+  ansible.builtin.slurp:
+    path: "{{ vm_runner_keys_dir_host | default('/var/lib/vmrunner/keys') }}/id_ed25519.pub"
+  register: vmrunner_pubkey
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Distribute vm-runner SSH key to all nodes
+  ansible.builtin.copy:
+    content: "{{ vmrunner_pubkey.content | b64decode }}"
+    dest: "{{ vm_runner_keys_dir_host | default('/var/lib/vmrunner/keys') }}/id_ed25519.pub"
+    mode: "0644"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Distribute vm-runner private key to all nodes
+  ansible.builtin.slurp:
+    path: "{{ vm_runner_keys_dir_host | default('/var/lib/vmrunner/keys') }}/id_ed25519"
+  register: vmrunner_privkey
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Install vm-runner private key on all nodes
+  ansible.builtin.copy:
+    content: "{{ vmrunner_privkey.content | b64decode }}"
+    dest: "{{ vm_runner_keys_dir_host | default('/var/lib/vmrunner/keys') }}/id_ed25519"
+    mode: "0600"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Download base image on all nodes (if missing)
+  ansible.builtin.get_url:
+    url: "{{ base_image_url }}"
+    dest: "/var/lib/vmrunner/images/{{ base_image_name }}"
+    mode: "0644"
+    checksum: "{{ ((base_image_sha256 | length) > 0) | ternary('sha256:' + base_image_sha256, omit) }}"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - base_image_url | length > 0
+    - base_image_name | length > 0
+  run_once: true
+
+- name: Check base image presence on nodes
+  ansible.builtin.stat:
+    path: "/var/lib/vmrunner/images/{{ base_image_name }}"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  register: base_image_stat
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - base_image_name | length > 0
+  run_once: true
+
+- name: Create VM runner qcow2 disk if missing
+  ansible.builtin.command: >
+    qemu-img create -f qcow2 -F qcow2 -b /var/lib/vmrunner/images/{{ base_image_name }}
+    {{ vm_runner_image_path }}
+  args:
+    creates: "{{ vm_runner_image_path }}"
+  loop: "{{ base_image_stat.results | selectattr('stat.exists', 'equalto', true) | map(attribute='item') | list }}"
+  delegate_to: "{{ item }}"
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - base_image_stat is defined
+    - base_image_name | length > 0
+  run_once: true
+
+- name: Write cloud-init user-data for vm-runner
+  ansible.builtin.copy:
+    dest: "/var/lib/vmrunner/seeds/user-data"
+    mode: "0644"
+    content: |
+      #cloud-config
+      preserve_hostname: false
+      hostname: {{ lab_name }}-vmrunner
+      ssh_pwauth: false
+      users:
+        - name: ubuntu
+          sudo: ALL=(ALL) NOPASSWD:ALL
+          shell: /bin/bash
+          ssh_authorized_keys:
+            - {{ vmrunner_pubkey.content | b64decode | trim }}
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Write cloud-init meta-data for vm-runner
+  ansible.builtin.copy:
+    dest: "/var/lib/vmrunner/seeds/meta-data"
+    mode: "0644"
+    content: |
+      instance-id: {{ lab_name }}-vmrunner
+      local-hostname: {{ lab_name }}-vmrunner
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Select seed tool packages
+  ansible.builtin.set_fact:
+    seed_tool_packages: "{{ ['cloud-image-utils'] if ansible_facts.os_family == 'Debian' else ['cloud-utils'] }}"
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Install seed tool packages
+  ansible.builtin.package:
+    name: "{{ seed_tool_packages }}"
+    state: present
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Check vm-runner image presence on nodes
+  ansible.builtin.command: docker image inspect {{ vm_runner_linux_image }}
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  register: vmrunner_image_check
+  changed_when: false
+  failed_when: false
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
+- name: Build list of nodes to rebuild vm-runner image
+  ansible.builtin.set_fact:
+    vmrunner_image_missing_nodes: "{{ vmrunner_hosts }}"
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - vm_runner_image_rebuild | default(false) | bool
+  run_once: true
+
+- name: Build list of nodes missing vm-runner image
+  ansible.builtin.set_fact:
+    vmrunner_image_missing_nodes: "{{ vmrunner_image_check.results | selectattr('rc', 'ne', 0) | map(attribute='item') | list }}"
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - not (vm_runner_image_rebuild | default(false) | bool)
+  run_once: true
+
+- name: Ensure vm-runner build directory exists
+  ansible.builtin.file:
+    path: "/var/lib/vmrunner/image-build/vm-runner-linux"
+    state: directory
+    mode: "0755"
+  loop: "{{ vmrunner_image_missing_nodes | default([]) }}"
+  delegate_to: "{{ item }}"
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - vmrunner_image_missing_nodes | default([]) | length > 0
+  run_once: true
+
+- name: Copy vm-runner Linux image build context to nodes
+  ansible.builtin.copy:
+    src: "{{ vm_runner_linux_context_src }}/"
+    dest: "/var/lib/vmrunner/image-build/vm-runner-linux/"
+    mode: "0644"
+  loop: "{{ vmrunner_image_missing_nodes | default([]) }}"
+  delegate_to: "{{ item }}"
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - vmrunner_image_missing_nodes | default([]) | length > 0
+  run_once: true
+
+- name: Build vm-runner Linux image on missing nodes
+  ansible.builtin.command: >
+    docker build -t {{ vm_runner_linux_image }} /var/lib/vmrunner/image-build/vm-runner-linux
+  loop: "{{ vmrunner_image_missing_nodes | default([]) }}"
+  delegate_to: "{{ item }}"
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - vmrunner_image_missing_nodes | default([]) | length > 0
+  run_once: true
+
+- name: Create cloud-init seed ISO if missing
+  ansible.builtin.shell: |
+    if command -v cloud-localds >/dev/null 2>&1; then
+      cloud-localds -v {{ vm_runner_seed_path }} /var/lib/vmrunner/seeds/user-data /var/lib/vmrunner/seeds/meta-data
+    elif command -v genisoimage >/dev/null 2>&1; then
+      genisoimage -output {{ vm_runner_seed_path }} -volid cidata -joliet -rock /var/lib/vmrunner/seeds/user-data /var/lib/vmrunner/seeds/meta-data
+    elif command -v xorriso >/dev/null 2>&1; then
+      xorriso -as mkisofs -output {{ vm_runner_seed_path }} -volid cidata -joliet -rock /var/lib/vmrunner/seeds/user-data /var/lib/vmrunner/seeds/meta-data
+    else
+      echo "Missing cloud-localds/genisoimage/xorriso" >&2
+      exit 1
+    fi
+  args:
+    creates: "{{ vm_runner_seed_path }}"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  when: vm_runner_prepare_assets | default(false) | bool
+  run_once: true
+
 - name: Get swarm node list
   ansible.builtin.command: docker node ls --format '{{ "{{.Hostname}}" }}'
   register: swarm_nodes

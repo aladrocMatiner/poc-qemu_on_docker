@@ -21,8 +21,10 @@ kvm_packages_debian:
   - qemu-system-x86
   - qemu-utils
   - ovmf
+  - cloud-image-utils
 
 kvm_packages_redhat:
   - qemu-kvm
   - qemu-img
   - edk2-ovmf
+  - cloud-utils

@@ -8,3 +8,13 @@ swarm_advertise_addr: "{{ lookup('env', 'SWARM_ADVERTISE_ADDR') | default('', tr
 vm_runner_keys_dir_host: "{{ lookup('env', 'VM_RUNNER_KEYS_DIR_HOST') | default('/var/lib/vmrunner/keys', true) }}"
 vm_runner_keys_dir_container: "{{ lookup('env', 'VM_RUNNER_KEYS_DIR_CONTAINER') | default('/vm/keys', true) }}"
 vm_ssh_key_path_in_container: "{{ lookup('env', 'VM_SSH_KEY_PATH_IN_CONTAINER') | default('/vm/keys/id_ed25519', true) }}"
+
+lab_name: "{{ lookup('env', 'LAB_NAME') | default('swarm-lab', true) }}"
+base_image_url: "{{ lookup('env', 'BASE_IMAGE_URL') | default('', true) }}"
+base_image_name: "{{ lookup('env', 'BASE_IMAGE_NAME') | default('', true) }}"
+base_image_sha256: "{{ lookup('env', 'BASE_IMAGE_SHA256') | default('', true) }}"
+
+vm_runner_image_path: "{{ lookup('env', 'VM_RUNNER_IMAGE_PATH') | default('/var/lib/vmrunner/images/linux.qcow2', true) }}"
+vm_runner_seed_path: "{{ lookup('env', 'VM_RUNNER_SEED_PATH') | default('/var/lib/vmrunner/seeds/linux-seed.iso', true) }}"
+vm_runner_linux_image: "{{ lookup('env', 'VM_RUNNER_LINUX_IMAGE') | default('poc/vm-runner-linux:latest', true) }}"
+vm_runner_image_rebuild: "{{ lookup('env', 'VM_RUNNER_IMAGE_REBUILD') | default('0', true) }}"
