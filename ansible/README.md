@@ -22,7 +22,7 @@ $ make ansible-swarm-poc-qemu-windows
 
 Case-based shortcuts (up/down):
 
-Case 00: vanilla services (two normal containers on different nodes)
+Case 00: vanilla services (two normal containers on different nodes). Goal: validate overlay connectivity between services.
 ```bash
 $ make ansible-swarm-poc-qemu-case00-up
 $ make ansible-swarm-poc-qemu-case00-test
@@ -31,9 +31,12 @@ $ make ansible-swarm-poc-qemu-case00-exec <container_name>
 $ make ansible-swarm-poc-qemu-case00-down
 ```
 
-Case 01: Linux VM runner (usable pipeline)
+Case 01: Linux VM runner (usable pipeline). Goal: same base overlay validation as Case 00, plus a Linux VM runner service.
 ```bash
 $ make ansible-swarm-poc-qemu-case01-up
+$ make ansible-swarm-poc-qemu-case01-test
+$ make ansible-swarm-poc-qemu-case01-exec-list
+$ make ansible-swarm-poc-qemu-case01-exec <container_name>
 $ make ansible-swarm-poc-qemu-case01-down
 ```
 

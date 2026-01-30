@@ -6,7 +6,7 @@ Demonstrate that a Swarm cluster can run normal container services and VM runner
 ## Demos / Cases
 
 ### Case 00: Vanilla services (two normal containers)
-- Purpose: prove Swarm can run two normal services on different nodes and they can ping each other over the same overlay network.
+- Purpose: validate overlay networking between two normal Swarm services placed on different nodes.
 - Stack: `stacks/phase2-linux-demo.yml`
 - Ansible:
 ```bash
@@ -16,19 +16,26 @@ make ansible-swarm-poc-qemu-case00-test
 make ansible-swarm-poc-qemu-case00-exec-list
 make ansible-swarm-poc-qemu-case00-exec <container_name>
 ```
-Required labels (one node each):
-```bash
-case00 placement is now automatic (random distinct nodes) during case00 up.
-```
+Notes:
+- Placement is automatic (random distinct nodes) during case00 up.
+- `case00-test` checks ping and HTTP between services on the overlay network.
+- `case00-exec-list` prints: CONTAINER, NODE, overlay IP, SERVICE (one per line).
+- `case00-exec` opens a shell in the selected container.
 
 ### Case 01: Linux VM runner (usable pipeline)
-- Purpose: reproducible Linux VM runner with deterministic MAC/IP and validation.
+- Purpose: same base overlay validation as Case 00, plus a Linux VM runner service in the stack.
 - Stack: `stacks/phase2-linux-usable.yml`
 - Ansible:
 ```bash
 make ansible-swarm-poc-qemu-case01-up
+make ansible-swarm-poc-qemu-case01-test
+make ansible-swarm-poc-qemu-case01-exec-list
+make ansible-swarm-poc-qemu-case01-exec <container_name>
 make ansible-swarm-poc-qemu-case01-down
 ```
+Notes:
+- `case01-test` reuses the same connectivity checks as Case 00 against the normal services.
+- `case01-exec-list` and `case01-exec` work the same as Case 00 for service containers.
 
 ### Case 02: Windows VM runner
 - Purpose: Windows VM runner with external ISO/virtio and access validation.
