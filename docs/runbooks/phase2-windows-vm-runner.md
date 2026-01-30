@@ -8,6 +8,9 @@ Run a Windows VM inside a Swarm VM runner service and validate via Ansible.
 - Nodes labeled `vm-capable=true`
 - `/dev/kvm` available on VM runner nodes
 - Windows ISO and virtio ISO paths configured (not committed)
+  - Defaults: `/var/lib/vmrunner/isos/windows.iso` and `/var/lib/vmrunner/isos/virtio.iso`
+  - Override with `VM_WINDOWS_ISO_HOST` and `VM_VIRTIO_ISO_HOST`
+- Windows base disk present (default: `/var/lib/vmrunner/images/windows.qcow2`, override with `VM_WINDOWS_DISK_HOST`)
 
 ## Procedure
 ```bash

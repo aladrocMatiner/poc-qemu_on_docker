@@ -7,6 +7,60 @@
       - stack_dest | length > 0
     fail_msg: "stack_name, stack_src, and stack_dest are required for vm_runner_windows"
 
+- name: Build vm-runner host list
+  ansible.builtin.set_fact:
+    vmrunner_hosts: "{{ groups['swarm_all'] | default(groups['swarm_managers'] + groups['swarm_workers']) }}"
+  run_once: true
+
+- name: Ensure vm-runner asset directories exist
+  ansible.builtin.file:
+    path: "{{ item.1 }}"
+    state: directory
+    mode: "0755"
+  loop: "{{ vmrunner_hosts | product([ '/var/lib/vmrunner/isos', '/var/lib/vmrunner/images' ]) | list }}"
+  delegate_to: "{{ item.0 }}"
+  run_once: true
+
+- name: Check Windows ISO presence on nodes
+  ansible.builtin.stat:
+    path: "{{ vm_windows_iso_host_path }}"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  register: windows_iso_stat
+  changed_when: false
+  run_once: true
+  when: vm_windows_assets_verify | default(true) | bool
+
+- name: Check virtio ISO presence on nodes
+  ansible.builtin.stat:
+    path: "{{ vm_windows_virtio_iso_host_path }}"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  register: virtio_iso_stat
+  changed_when: false
+  run_once: true
+  when: vm_windows_assets_verify | default(true) | bool
+
+- name: Check Windows disk presence on nodes
+  ansible.builtin.stat:
+    path: "{{ vm_windows_disk_host_path }}"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  register: windows_disk_stat
+  changed_when: false
+  run_once: true
+  when: vm_windows_assets_verify | default(true) | bool
+
+- name: Assert Windows assets are present on all nodes
+  ansible.builtin.assert:
+    that:
+      - windows_iso_stat.results | selectattr('stat.exists', 'equalto', false) | list | length == 0
+      - virtio_iso_stat.results | selectattr('stat.exists', 'equalto', false) | list | length == 0
+      - windows_disk_stat.results | selectattr('stat.exists', 'equalto', false) | list | length == 0
+    fail_msg: "Missing Windows VM assets on one or more nodes. Provide ISOs and disk at the configured paths."
+  when: vm_windows_assets_verify | default(true) | bool
+  run_once: true
+
 - name: Deploy stack
   ansible.builtin.import_role:
     name: swarm_stack

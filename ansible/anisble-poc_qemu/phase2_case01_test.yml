@@ -9,9 +9,7 @@
     svc_web: "{{ stack_name }}_{{ case_prefix }}-web"
     svc_ping: "{{ stack_name }}_{{ case_prefix }}-ping"
     vm_service: "{{ stack_name }}_vm-runner-linux"
-    vm_ssh_port: 2222
-    vm_ssh_user: ubuntu
-    vm_ssh_key: "{{ vm_ssh_key_path_in_container }}"
+    vm_linux_ips: "{{ vm_linux_ips | default([]) }}"
   tasks:
     - name: Ensure case01 services exist
       ansible.builtin.command: docker service ls --format '{{ "{{.Name}}" }}'
@@ -75,48 +73,32 @@
           - "case01-ping -> case01-web ping rc: {{ ping_result.rc | default('n/a') }}"
           - "case01-ping -> case01-web http rc: {{ http_check.rc | default('n/a') }}"
 
-    - name: Get vm-runner container id
-      ansible.builtin.command: docker ps --filter label=com.docker.swarm.service.name={{ vm_service }} --format '{{ "{{.ID}}" }}'
-      register: vm_runner_container
+    - name: Ensure vm-runner service is running
+      ansible.builtin.command: docker service ps {{ vm_service }} --filter desired-state=running --format '{{ "{{.ID}}" }}'
+      register: vm_runner_tasks
       changed_when: false
 
-    - name: Ensure vm-runner container is running
+    - name: Assert vm-runner has a running task
       ansible.builtin.assert:
         that:
-          - vm_runner_container.stdout | length > 0
+          - vm_runner_tasks.stdout | length > 0
         fail_msg: "vm-runner-linux container not running."
 
-    - name: Ensure VM SSH key is available in vm-runner container
-      ansible.builtin.command: >
-        docker exec {{ vm_runner_container.stdout }}
-        /bin/sh -c "test -f {{ vm_ssh_key }}"
-      register: vm_key_check
-      changed_when: false
-
-    - name: Assert VM SSH key exists
+    - name: Require Linux VM IPs for L2 validation
       ansible.builtin.assert:
         that:
-          - vm_key_check.rc == 0
-        fail_msg: "Missing VM SSH key at {{ vm_ssh_key }} inside vm-runner container."
+          - vm_linux_ips | length > 0
+        fail_msg: "Provide vm_linux_ips (e.g., vm_linux_ips=['192.168.123.50']) to validate L2 connectivity."
 
-    - name: Ensure vm-runner container is on case01-net
-      ansible.builtin.command: docker inspect --format '{{ "{{ range $k, $v := .NetworkSettings.Networks }}{{ $k }} {{ end }}" }}' {{ vm_runner_container.stdout }}
-      register: vm_runner_networks
-      changed_when: false
-
-    - name: Validate vm-runner network attachment
-      ansible.builtin.assert:
-        that:
-          - "'case01-net' in vm_runner_networks.stdout"
-        fail_msg: "vm-runner-linux is not attached to case01-net (overlay)."
-
-    - name: Check VM can reach case01-web (via SSH inside VM)
+    - name: L2 connectivity check from node to VM (ping + SSH port)
       ansible.builtin.command: >
-        docker exec {{ vm_runner_container.stdout }}
-        /bin/sh -c "ssh -o StrictHostKeyChecking=accept-new -o BatchMode=yes -i {{ vm_ssh_key }} -p {{ vm_ssh_port }} {{ vm_ssh_user }}@127.0.0.1 ping -c 1 {{ case_prefix }}-web"
-      register: vm_ping
+        docker run --rm --network host alpine:3.19
+        /bin/sh -c "ping -c 1 {{ item }} && nc -z -w 3 {{ item }} 22"
+      loop: "{{ vm_linux_ips }}"
+      register: vm_l2_checks
       changed_when: false
 
-    - name: Show VM ping result
+    - name: Show VM L2 connectivity results
       ansible.builtin.debug:
-        msg: "VM -> {{ case_prefix }}-web: {{ vm_ping.stdout | default('') }}"
+        msg: "L2 check for {{ item.item }} rc={{ item.rc | default('n/a') }}"
+      loop: "{{ vm_l2_checks.results }}"

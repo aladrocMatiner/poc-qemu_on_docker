@@ -18,3 +18,7 @@ vm_runner_image_path: "{{ lookup('env', 'VM_RUNNER_IMAGE_PATH') | default('/var/
 vm_runner_seed_path: "{{ lookup('env', 'VM_RUNNER_SEED_PATH') | default('/var/lib/vmrunner/seeds/linux-seed.iso', true) }}"
 vm_runner_linux_image: "{{ lookup('env', 'VM_RUNNER_LINUX_IMAGE') | default('poc/vm-runner-linux:latest', true) }}"
 vm_runner_image_rebuild: "{{ lookup('env', 'VM_RUNNER_IMAGE_REBUILD') | default('0', true) }}"
+
+vm_windows_iso_host_path: "{{ lookup('env', 'VM_WINDOWS_ISO_HOST') | default('/var/lib/vmrunner/isos/windows.iso', true) }}"
+vm_windows_virtio_iso_host_path: "{{ lookup('env', 'VM_VIRTIO_ISO_HOST') | default('/var/lib/vmrunner/isos/virtio.iso', true) }}"
+vm_windows_disk_host_path: "{{ lookup('env', 'VM_WINDOWS_DISK_HOST') | default('/var/lib/vmrunner/images/windows.qcow2', true) }}"

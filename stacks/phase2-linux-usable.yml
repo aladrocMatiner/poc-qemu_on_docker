@@ -32,8 +32,7 @@ services:
 
   vm-runner-linux:
     image: ${VM_RUNNER_LINUX_IMAGE:-poc/vm-runner-linux:latest}
-    networks:
-      - case01-net
+    network_mode: host
     deploy:
       replicas: 1
       placement:
@@ -41,13 +40,18 @@ services:
           - node.labels.vm-capable==true
       restart_policy:
         condition: any
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
     environment:
       VM_NAME: swarm-lab-linux-usable
       VM_MAC: 52:54:00:ab:cd:41
       VM_DISK: /var/lib/vmrunner/images/linux.qcow2
       VM_SEED: /var/lib/vmrunner/seeds/linux-seed.iso
-      VM_NET_MODE: user
-      VM_SSH_FWD_PORT: 2222
+      VM_NET_MODE: bridge
+      VM_BRIDGE: br0
       VM_SSH_USER: ubuntu
     volumes:
       - /dev/kvm:/dev/kvm
