@@ -46,6 +46,7 @@ $ make lab-status   # generate inventory + show status
 If SSH access is not ready yet, you can use the serial console:
 
 ```bash
+$ make lab-ssh NODE=1       # SSH via inventory (if IP known)
 $ make lab-console NODE=1   # serial console access
 ```
 
