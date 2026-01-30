@@ -41,6 +41,12 @@ $ make lab-up
 $ make lab-status
 ```
 
+If SSH access is not ready yet, you can use the serial console:
+
+```bash
+$ make lab-console NODE=1
+```
+
 5. Configure with Ansible:
 
 ```bash
