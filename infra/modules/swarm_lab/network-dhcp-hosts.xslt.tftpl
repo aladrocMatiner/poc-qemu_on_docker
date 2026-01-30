@@ -9,6 +9,21 @@
     </xsl:copy>
   </xsl:template>
 
+  <xsl:template match="/network">
+    <xsl:copy>
+      <xsl:apply-templates select="@*|node()"/>
+      <xsl:if test="not(dns)">
+        <dns enable="yes"/>
+      </xsl:if>
+    </xsl:copy>
+  </xsl:template>
+
+  <xsl:template match="/network/dns">
+    <dns enable="yes">
+      <xsl:apply-templates select="node()"/>
+    </dns>
+  </xsl:template>
+
   <xsl:template match="/network/ip/dhcp">
     <xsl:copy>
       <xsl:apply-templates select="@*|node()"/>
