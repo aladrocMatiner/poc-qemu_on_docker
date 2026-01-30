@@ -14,7 +14,7 @@ $ ${EDITOR:-nano} .env
 Notes:
 - `SWARM_BRIDGE` must exist on the host (default `br0`).
 - If you do not have a bridge yet, create one with:
-  `HOST_NETWORK_ASSUME_YES=1 make host-network-setup`
+  `HOST_NETWORK_ASSUME_YES=1 make host-network-setup`  # create bridges only (no NIC attach)
   (this creates the bridge only; it does not attach a NIC or assign IPs).
 - Lab domains disable AppArmor confinement via libvirt `seclabel` injection
   (`infra/modules/swarm_lab/domain-seclabel-none.xslt`) to avoid disk access
@@ -23,7 +23,7 @@ Notes:
 2. Bootstrap host tools:
 
 ```bash
-$ make bootstrap
+$ make bootstrap    # install prerequisites
 ```
 
 If bootstrap adds you to `libvirt`, `kvm`, or `docker` groups, log out/in to apply.
@@ -31,7 +31,7 @@ If bootstrap adds you to `libvirt`, `kvm`, or `docker` groups, log out/in to app
 3. Initialize and apply lab:
 
 ```bash
-$ make lab-init
+$ make lab-init     # init OpenTofu
 $ make image-fetch   # download base cloud image
 $ make lab-up        # provision VMs via OpenTofu/libvirt
 ```
@@ -39,13 +39,13 @@ $ make lab-up        # provision VMs via OpenTofu/libvirt
 4. Generate inventory and inspect status:
 
 ```bash
-$ make lab-status
+$ make lab-status   # generate inventory + show status
 ```
 
 If SSH access is not ready yet, you can use the serial console:
 
 ```bash
-$ make lab-console NODE=1
+$ make lab-console NODE=1   # serial console access
 ```
 
 5. Configure with Ansible:
@@ -63,13 +63,13 @@ $ make ansible-verify     # verify Docker + Swarm state
 6. Optional smoke tests:
 
 ```bash
-$ make smoke
+$ make smoke        # full end-to-end smoke
 ```
 
 7. Developer diagnostics:
 
 ```bash
-$ make doctor
+$ make doctor       # environment + toolchain checks
 ```
 
 `make doctor` runs `tofu validate`, so ensure `make lab-init` has been run at least once.
