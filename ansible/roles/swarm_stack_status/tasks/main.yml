@@ -18,7 +18,7 @@
   failed_when: false
 
 - name: Inspect demo-ping network names
-  ansible.builtin.command: docker inspect --format '{{ range $k, $v := .NetworksAttachments }}{{ $v.Network.Spec.Name }} {{ end }}' {{ demo_ping_task.stdout_lines[0] }}
+  ansible.builtin.command: docker inspect --format '{{ "{{ range $k, $v := .NetworksAttachments }}{{ $v.Network.Spec.Name }} {{ end }}" }}' {{ demo_ping_task.stdout_lines[0] }}
   register: demo_ping_networks
   changed_when: false
   failed_when: false
