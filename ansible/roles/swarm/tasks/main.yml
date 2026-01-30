@@ -25,3 +25,24 @@
     docker swarm join --token {{ hostvars[groups['swarm_managers'][0]].worker_token.stdout }}
     {{ hostvars[groups['swarm_managers'][0]].ansible_host | default(groups['swarm_managers'][0]) }}:2377
   when: inventory_hostname in groups['swarm_workers'] and swarm_state.stdout != 'active'
+
+- name: Build node label targets
+  ansible.builtin.set_fact:
+    swarm_label_targets: "{{ swarm_label_targets | default([]) + [ {
+      'name': item,
+      'index': (item | regex_search('node(\\d+)$', '\\1') | default('0', true)),
+      'role': ('manager' if item in groups['swarm_managers'] else 'worker')
+    } ] }}"
+  loop: "{{ groups['swarm_managers'] + groups['swarm_workers'] }}"
+  run_once: true
+
+- name: Apply node identity labels
+  ansible.builtin.command: >
+    docker node update
+    --label-add node-index={{ item.index }}
+    --label-add node-name={{ item.name }}
+    --label-add node-role={{ item.role }}
+    {{ item.name }}
+  loop: "{{ swarm_label_targets }}"
+  run_once: true
+  delegate_to: "{{ groups['swarm_managers'][0] }}"
