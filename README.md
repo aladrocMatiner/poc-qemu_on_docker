@@ -93,7 +93,7 @@ Case 00: vanilla services (two normal containers on different nodes)
 $ make ansible-swarm-poc-qemu-case00-up
 $ make ansible-swarm-poc-qemu-case00-test
 $ make ansible-swarm-poc-qemu-case00-exec-list
-$ make ansible-swarm-poc-qemu-case00-exec NAME=<container_name>
+$ make ansible-swarm-poc-qemu-case00-exec <container_name>
 $ make ansible-swarm-poc-qemu-case00-down
 ```
 

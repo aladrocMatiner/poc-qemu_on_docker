@@ -13,11 +13,11 @@ INV_JSON=${WORKDIR:-work}/inventory.json
 SSH_USER=${SSH_USER:-ubuntu}
 SSH_KEY=${ANSIBLE_SSH_PRIVATE_KEY:-${SSH_PRIVATE_KEY:-}}
 STACK_NAME=${STACK_NAME:-phase2-linux-demo}
-CONTAINER_NAME=${NAME:-${CONTAINER_NAME:-}}
+CONTAINER_NAME=${NAME:-${CONTAINER_NAME:-${1:-}}}
 EXEC_SHELL=${EXEC_SHELL:-/bin/sh}
 
 if [[ -z "${CONTAINER_NAME}" ]]; then
-  err "Missing container name. Use NAME=<container_name>."
+  err "Missing container name. Use: make ansible-swarm-poc-qemu-case00-exec <container_name> (or NAME=...)."
   exit 1
 fi
 
@@ -26,16 +26,13 @@ if [[ ! -f "${INV_JSON}" ]]; then
   exit 1
 fi
 
-if [[ -z "${SSH_KEY}" || ! -f "${SSH_KEY}" ]]; then
-  err "Missing SSH key. Set ANSIBLE_SSH_PRIVATE_KEY or SSH_PRIVATE_KEY."
-  exit 1
-fi
-
 ssh_opts=(
-  -i "${SSH_KEY}"
   -o BatchMode=yes
   -o StrictHostKeyChecking=accept-new
 )
+if [[ -n "${SSH_KEY}" && -f "${SSH_KEY}" ]]; then
+  ssh_opts+=(-i "${SSH_KEY}")
+fi
 
 found_node=""
 found_ip=""
@@ -44,7 +41,15 @@ found_id=""
 jq -r '.nodes[] | select(.mgmt_ip) | "\(.name)|\(.mgmt_ip)"' "${INV_JSON}" | while IFS='|' read -r node ip; do
   cid=$(ssh "${ssh_opts[@]}" "${SSH_USER}@${ip}" bash -s <<EOF_REMOTE || true
 set -euo pipefail
-match=$(docker ps --format '{{.Names}} {{.ID}}' | awk -v n="${CONTAINER_NAME}" '$1==n {print $2; exit}')
+DOCKER=docker
+if ! \$DOCKER ps >/dev/null 2>&1; then
+  if sudo -n docker ps >/dev/null 2>&1; then
+    DOCKER="sudo -n docker"
+  else
+    exit 0
+  fi
+fi
+match=$(\$DOCKER ps --format '{{.Names}} {{.ID}}' | awk -v n="${CONTAINER_NAME}" '$1==n {print $2; exit}')
 if [[ -n "${match}" ]]; then
   echo "${match}"
 fi
@@ -64,4 +69,4 @@ if [[ -z "${found_id}" ]]; then
 fi
 
 log "Connecting to ${CONTAINER_NAME} on ${found_node} (${found_ip})"
-ssh -t "${ssh_opts[@]}" "${SSH_USER}@${found_ip}" "docker exec -it ${found_id} ${EXEC_SHELL}"
+ssh -t "${ssh_opts[@]}" "${SSH_USER}@${found_ip}" "docker ps >/dev/null 2>&1 || sudo -n docker ps >/dev/null 2>&1; if docker ps >/dev/null 2>&1; then docker exec -it ${found_id} ${EXEC_SHELL}; else sudo -n docker exec -it ${found_id} ${EXEC_SHELL}; fi"
