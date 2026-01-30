@@ -1,0 +1,37 @@
+---
+- name: Assert required vars for Windows VM runner
+  ansible.builtin.assert:
+    that:
+      - stack_name | length > 0
+      - stack_src | length > 0
+      - stack_dest | length > 0
+    fail_msg: "stack_name, stack_src, and stack_dest are required for vm_runner_windows"
+
+- name: Deploy stack
+  ansible.builtin.import_role:
+    name: swarm_stack
+
+- name: Validate stack status
+  ansible.builtin.import_role:
+    name: swarm_stack_status
+
+- name: Print Windows VM IPs if provided
+  ansible.builtin.debug:
+    msg: "Windows VM IPs: {{ vm_windows_ips }}"
+  when: vm_windows_ips | length > 0
+
+- name: Wait for Windows RDP (optional)
+  ansible.builtin.wait_for:
+    host: "{{ item }}"
+    port: 3389
+    timeout: 120
+  loop: "{{ vm_windows_ips }}"
+  when: vm_windows_ips | length > 0
+
+- name: Wait for Windows WinRM (optional)
+  ansible.builtin.wait_for:
+    host: "{{ item }}"
+    port: 5985
+    timeout: 120
+  loop: "{{ vm_windows_ips }}"
+  when: vm_windows_ips | length > 0

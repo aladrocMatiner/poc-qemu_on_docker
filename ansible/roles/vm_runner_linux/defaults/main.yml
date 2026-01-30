@@ -1,0 +1,5 @@
+---
+stack_name: phase2-linux-usable
+stack_src: ""
+stack_dest: /tmp/phase2-linux-usable.yml
+vm_linux_ips: []

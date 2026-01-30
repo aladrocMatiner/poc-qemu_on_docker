@@ -1,0 +1,5 @@
+---
+stack_name: phase2-windows-vm
+stack_src: ""
+stack_dest: /tmp/phase2-windows-vm.yml
+vm_windows_ips: []

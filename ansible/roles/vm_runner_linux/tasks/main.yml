@@ -1,0 +1,29 @@
+---
+- name: Assert required vars for Linux VM runner
+  ansible.builtin.assert:
+    that:
+      - stack_name | length > 0
+      - stack_src | length > 0
+      - stack_dest | length > 0
+    fail_msg: "stack_name, stack_src, and stack_dest are required for vm_runner_linux"
+
+- name: Deploy stack
+  ansible.builtin.import_role:
+    name: swarm_stack
+
+- name: Validate stack status
+  ansible.builtin.import_role:
+    name: swarm_stack_status
+
+- name: Print Linux VM IPs if provided
+  ansible.builtin.debug:
+    msg: "Linux VM IPs: {{ vm_linux_ips }}"
+  when: vm_linux_ips | length > 0
+
+- name: Wait for Linux VM SSH (optional)
+  ansible.builtin.wait_for:
+    host: "{{ item }}"
+    port: 22
+    timeout: 60
+  loop: "{{ vm_linux_ips }}"
+  when: vm_linux_ips | length > 0

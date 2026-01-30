@@ -19,6 +19,11 @@ $ make ansible-swarm-poc-qemu-demo
 $ make ansible-swarm-poc-qemu-linux
 $ make ansible-swarm-poc-qemu-windows
 ```
+Roles used by Phase 2 playbooks:
+- `roles/swarm_stack`
+- `roles/swarm_stack_status`
+- `roles/vm_runner_linux`
+- `roles/vm_runner_windows`
 
 ## Inventory
 Generated inventory is written to `ansible/inventories/generated/inventory.ini`.

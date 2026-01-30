@@ -8,19 +8,4 @@
     stack_src: "{{ playbook_dir }}/../../stacks/phase2-linux-usable.yml"
     stack_dest: /tmp/phase2-linux-usable.yml
   roles:
-    - swarm_stack
-    - swarm_stack_status
-
-  tasks:
-    - name: Print Linux VM IPs if provided
-      ansible.builtin.debug:
-        msg: "Linux VM IPs: {{ vm_linux_ips }}"
-      when: vm_linux_ips is defined and (vm_linux_ips | length) > 0
-
-    - name: Wait for Linux VM SSH (optional)
-      ansible.builtin.wait_for:
-        host: "{{ item }}"
-        port: 22
-        timeout: 60
-      loop: "{{ vm_linux_ips | default([]) }}"
-      when: vm_linux_ips is defined and (vm_linux_ips | length) > 0
+    - vm_runner_linux
