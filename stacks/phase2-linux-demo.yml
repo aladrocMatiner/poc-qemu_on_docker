@@ -14,6 +14,16 @@ services:
       restart_policy:
         condition: any
 
+  demo-ping:
+    image: alpine:3.19
+    command: ["/bin/sh", "-c", "sleep 3600"]
+    networks:
+      - demo-net
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+
   vm-runner-linux:
     image: ${VM_RUNNER_LINUX_IMAGE:-poc/vm-runner-linux:latest}
     # NOTE: QEMU runner requires /dev/kvm and (optionally) /dev/net/tun.
