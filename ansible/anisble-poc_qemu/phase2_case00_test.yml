@@ -5,8 +5,9 @@
   gather_facts: false
   vars:
     stack_name: phase2-linux-demo
-    svc_web: "{{ stack_name }}_case00-web"
-    svc_ping: "{{ stack_name }}_case00-ping"
+    case_prefix: case00
+    svc_web: "{{ stack_name }}_{{ case_prefix }}-web"
+    svc_ping: "{{ stack_name }}_{{ case_prefix }}-ping"
   tasks:
     - name: Ensure case00 services exist
       ansible.builtin.command: docker service ls --format '{{ "{{.Name}}" }}'

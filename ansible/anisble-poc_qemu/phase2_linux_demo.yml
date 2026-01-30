@@ -7,5 +7,6 @@
     stack_name: phase2-linux-demo
     stack_src: "{{ playbook_dir }}/../../stacks/phase2-linux-demo.yml"
     stack_dest: /tmp/phase2-linux-demo.yml
+    case_prefix: case00
   roles:
     - phase2_demo

@@ -13,14 +13,15 @@ INV_JSON=${WORKDIR:-work}/inventory.json
 SSH_USER=${SSH_USER:-ubuntu}
 SSH_KEY=${ANSIBLE_SSH_PRIVATE_KEY:-${SSH_PRIVATE_KEY:-}}
 STACK_NAME=${STACK_NAME:-phase2-linux-demo}
+CASE_PREFIX=${CASE_PREFIX:-case00}
 
 if [[ ! -f "${INV_JSON}" ]]; then
   err "Missing ${INV_JSON}. Run: make lab-status"
   exit 1
 fi
 
-svc_web="${STACK_NAME}_case00-web"
-svc_ping="${STACK_NAME}_case00-ping"
+svc_web="${STACK_NAME}_${CASE_PREFIX}-web"
+svc_ping="${STACK_NAME}_${CASE_PREFIX}-ping"
 
 ssh_opts=(
   -o BatchMode=yes

@@ -5,6 +5,7 @@
       - stack_name | length > 0
       - stack_src | length > 0
       - stack_dest | length > 0
+      - case_prefix | length > 0
     fail_msg: "stack_name, stack_src, and stack_dest are required for phase2_demo"
 
 - name: Get swarm node list
@@ -20,35 +21,35 @@
     fail_msg: "Need at least two swarm nodes to place case00 services on different hosts."
   run_once: true
 
-- name: Select two distinct nodes for case00 services
+- name: Select two distinct nodes for services
   ansible.builtin.set_fact:
     case00_nodes: "{{ swarm_nodes.stdout_lines | shuffle | list }}"
   run_once: true
 
-- name: Clear existing case00 labels
-  ansible.builtin.command: docker node update --label-rm case00-web --label-rm case00-ping {{ item }}
+- name: Clear existing labels for case prefix
+  ansible.builtin.command: docker node update --label-rm {{ case_prefix }}-web --label-rm {{ case_prefix }}-ping {{ item }}
   loop: "{{ swarm_nodes.stdout_lines }}"
   run_once: true
   changed_when: false
   failed_when: false
 
-- name: Apply case00 labels to two nodes
+- name: Apply labels to two nodes (web)
   ansible.builtin.command: >
     docker node update
-    --label-add case00-web=true
+    --label-add {{ case_prefix }}-web=true
     {{ case00_nodes[0] }}
   run_once: true
 
-- name: Apply case00 labels to second node
+- name: Apply labels to second node (ping)
   ansible.builtin.command: >
     docker node update
-    --label-add case00-ping=true
+    --label-add {{ case_prefix }}-ping=true
     {{ case00_nodes[1] }}
   run_once: true
 
-- name: Show case00 placement
+- name: Show placement
   ansible.builtin.debug:
-    msg: "case00-web -> {{ case00_nodes[0] }}, case00-ping -> {{ case00_nodes[1] }}"
+    msg: "{{ case_prefix }}-web -> {{ case00_nodes[0] }}, {{ case_prefix }}-ping -> {{ case00_nodes[1] }}"
   run_once: true
 
 - name: Deploy demo stack

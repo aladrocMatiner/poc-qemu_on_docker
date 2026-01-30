@@ -1,4 +1,8 @@
 ---
+- name: Set default case prefix
+  ansible.builtin.set_fact:
+    case_prefix: "{{ case_prefix | default('case00') }}"
+
 - name: List stack services
   ansible.builtin.command: docker stack services {{ stack_name }} --format '{{ "{{.Name}}" }}'
   register: stack_services
@@ -11,8 +15,8 @@
   failed_when: service_tasks.stdout_lines | length < 1
   loop: "{{ stack_services.stdout_lines }}"
 
-- name: Capture case00-ping container id (if present)
-  ansible.builtin.command: docker ps --filter label=com.docker.swarm.service.name={{ stack_name }}_case00-ping --format '{{ "{{.ID}}" }}'
+- name: Capture ping container id (if present)
+  ansible.builtin.command: docker ps --filter label=com.docker.swarm.service.name={{ stack_name }}_{{ case_prefix }}-ping --format '{{ "{{.ID}}" }}'
   register: demo_ping_container
   changed_when: false
   failed_when: false
@@ -24,8 +28,8 @@
   failed_when: false
   when: demo_ping_container.stdout_lines | length > 0
 
-- name: Check case00-ping can resolve and ping case00-web
-  ansible.builtin.command: docker exec {{ demo_ping_container.stdout_lines[0] }} ping -c 1 case00-web
+- name: Check ping can resolve and ping web
+  ansible.builtin.command: docker exec {{ demo_ping_container.stdout_lines[0] }} ping -c 1 {{ case_prefix }}-web
   register: demo_ping
   changed_when: false
   failed_when: false
@@ -39,19 +43,19 @@
       - "demo-ping rc: {{ demo_ping.rc | default('n/a') }}"
   when: demo_ping_container.stdout_lines | length > 0
 
-- name: Capture case00 service nodes
+- name: Capture service nodes
   ansible.builtin.command: docker service ps --filter desired-state=running --format '{{ "{{.Node}}" }}' {{ item }}
   register: demo_service_nodes
   changed_when: false
   loop:
-    - "{{ stack_name }}_case00-web"
-    - "{{ stack_name }}_case00-ping"
+    - "{{ stack_name }}_{{ case_prefix }}-web"
+    - "{{ stack_name }}_{{ case_prefix }}-ping"
 
-- name: Ensure case00 services run on different nodes
+- name: Ensure services run on different nodes
   ansible.builtin.assert:
     that:
       - demo_service_nodes.results[0].stdout_lines | length > 0
       - demo_service_nodes.results[1].stdout_lines | length > 0
       - demo_service_nodes.results[0].stdout_lines[0] != demo_service_nodes.results[1].stdout_lines[0]
-    fail_msg: "case00-web and case00-ping must be on different nodes (check case00 labels)."
+    fail_msg: "web and ping must be on different nodes (check labels)."
   when: demo_service_nodes.results | length == 2
