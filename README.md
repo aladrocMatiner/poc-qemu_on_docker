@@ -53,10 +53,11 @@ $ make lab-console NODE=1   # serial console access
 5. Configure with Ansible:
 
 ```bash
+$ make ansible-all        # run full Ansible flow end-to-end
+# or:
 $ make ansible-bootstrap  # install required Ansible collections
 $ make ansible-inventory  # generate inventory.ini from lab outputs
 $ make ansible-ping       # verify SSH connectivity to all nodes
-$ make ansible-all        # run full Ansible flow end-to-end
 $ make ansible-baseline   # apply baseline OS configuration
 $ make ansible-docker     # install and enable Docker
 $ make ansible-swarm      # initialize/join Docker Swarm
