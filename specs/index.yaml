@@ -179,6 +179,16 @@ specs:
     related_runbooks: []
     related_adrs: []
 
+  - id: phase2-qemu-in-container
+    title: Phase 2 QEMU-in-container PoC on Swarm
+    owner_agent: vmrunnerops
+    status: draft
+    priority: high
+    dependencies: [qemu-runner-container, qemu-tap-bridge, ansible-vm-configuration]
+    related_skills: [ansible_phase2_smoke, ansible_vm_runner_linux, qemu_kvm_in_container, qemu_tap_bridge_networking]
+    related_runbooks: [docs/runbooks/ansible-operations.md]
+    related_adrs: []
+
   - id: ci-smoke-tests
     title: CI smoke tests for Swarm + VMs
     owner_agent: sre

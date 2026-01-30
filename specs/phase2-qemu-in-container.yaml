@@ -1,51 +1,76 @@
+# OpenSpec Challenge: Phase 2 - QEMU in Container (Swarm)
 id: phase2-qemu-in-container
-title: Phase 2 QEMU-in-container (placeholder)
+title: Phase 2 QEMU-in-container PoC on Swarm
 status: draft
-owner_agent: vmops
-priority: low
+owner_agent: vmrunnerops
+priority: high
 
-problem_statement: |
-  Future phase will run QEMU/KVM inside containers while respecting Swarm
-  constraints (no privileged).
+problem_statement: >
+  Demonstrate that a Swarm cluster can run normal container services and
+  VM runner services (QEMU/KVM) side-by-side, starting with a Linux VM and
+  extending to Windows VM support.
 
 scope:
-  - Define planned approach and constraints
+  - Deploy a Swarm service running a Linux VM inside a container (QEMU/KVM).
+  - Keep a normal Swarm service running in parallel.
+  - Provide L2 access for the VM via TAP/bridge (br0) and DHCP reservations.
+  - Ensure access paths (console/SSH) are documented and tested.
 
 non_goals:
-  - Implementation in Phase 1
+  - Production-grade hardening or HA guarantees.
+  - Full Windows automation (handled in a separate spec).
+  - Performance benchmarking beyond basic verification.
 
 constraints:
-  - No privileged services in Swarm
-  - /dev/kvm bind-mounts only
+  - Swarm services must not use --privileged.
+  - Use /dev/kvm bind mounts and minimal Linux capabilities.
+  - No secrets or binaries committed to git.
 
 assumptions:
-  - Swarm cluster available
+  - Host supports KVM and libvirt is configured.
+  - br0 exists and DHCP reservations are available for VM MACs.
+  - Ansible is the primary test interface.
 
 interfaces:
   inputs:
-    - TBD
+    - Swarm node labels (vm-capable=true)
+    - VM runner image (QEMU/KVM)
+    - qcow2 base image and cloud-init seed
   outputs:
-    - TBD
+    - Swarm service definitions for normal and VM runner services
+    - VM reachable on L2 network with stable IP
 
 acceptance_tests:
-  - name: TBD
-    command: "TBD"
-    expected: "TBD"
+  - command: make ansible-run PLAYBOOK=ansible/anisble-poc_qemu/phase2_smoke.yml
+    expected: "Normal service running + Linux VM runner active + VM reachable"
+  - command: make ansible-swarm-status
+    expected: "Swarm healthy; VM runner service scheduled on vm-capable nodes"
 
 rollback:
-  - TBD
+  - command: make lab-destroy
+    expected: "VM runner services and lab resources removed"
 
 security_considerations:
-  - Least privilege caps only
+  - Minimal capabilities and /dev/kvm only; no privileged containers.
+  - Console ports published in host mode with firewall restrictions.
+  - No credentials stored in repo; use Ansible Vault if needed.
 
 artifacts_produced:
-  - Placeholder spec only
+  - Swarm service spec(s) for VM runner
+  - Ansible playbooks under ansible/anisble-poc_qemu
 
-dependencies: []
+dependencies:
+  - qemu-runner-container
+  - qemu-tap-bridge
+  - ansible-vm-configuration
 
 related_skills:
+  - ansible_phase2_smoke
+  - ansible_vm_runner_linux
   - qemu_kvm_in_container
+  - qemu_tap_bridge_networking
 
 related_docs:
-  runbooks: []
+  runbooks:
+    - docs/runbooks/ansible-operations.md
   adrs: []

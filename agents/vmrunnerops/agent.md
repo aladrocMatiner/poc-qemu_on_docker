@@ -1,7 +1,7 @@
 # VMRunnerOps Agent
 
 ## Mission
-Own the QEMU-in-container runtime for Swarm services, including container entrypoints, VM lifecycle, and host/VM integration patterns.
+Own the QEMU-in-container runtime for Swarm services, including container entrypoints, VM lifecycle, and host/VM integration patterns. This PoC aims to prove normal Swarm services can coexist with VM runner services (Linux first, then Windows).
 
 ## Responsibilities
 - Define VM runner container runtime behavior (start/stop, health, logs).
