@@ -84,6 +84,28 @@ $ make doctor       # environment + toolchain checks
 - `MGMT_MODE=user` (default): uses libvirt NAT network and DHCP lease discovery. If `MGMT_NETWORK_CIDR` is set, the lab creates the network and reserves fixed IPs starting at `MGMT_IP_START` (use a non-default `MGMT_NETWORK` name).
 - `MGMT_MODE=bridge`: attaches mgmt NIC to `MGMT_BRIDGE` (must exist).
 
+## Phase 2 (QEMU-in-Container PoC)
+
+Phase 2 runs Swarm services that include VM runner containers (Linux first, then Windows).
+
+Case 00: demo stack (normal services + Linux VM runner)
+```bash
+$ make ansible-swarm-poc-qemu-case00-up
+$ make ansible-swarm-poc-qemu-case00-down
+```
+
+Case 01: Linux VM runner (usable pipeline)
+```bash
+$ make ansible-swarm-poc-qemu-case01-up
+$ make ansible-swarm-poc-qemu-case01-down
+```
+
+Case 02: Windows VM runner
+```bash
+$ make ansible-swarm-poc-qemu-case02-up
+$ make ansible-swarm-poc-qemu-case02-down
+```
+
 ## Docs
 
 - `docs/runbooks/opentofu-libvirt.md`
