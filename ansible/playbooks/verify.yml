@@ -3,6 +3,15 @@
   hosts: swarm_all
   become: true
   tasks:
+    - name: Swarm local state (all nodes)
+      command: docker info --format '{{.Swarm.LocalNodeState}} {{.Swarm.NodeID}}'
+      register: swarm_local
+      changed_when: false
+
+    - name: Print swarm local state
+      ansible.builtin.debug:
+        msg: "Swarm local: {{ swarm_local.stdout }}"
+
     - name: Docker active
       command: systemctl is-active docker
       register: docker_active
