@@ -62,14 +62,11 @@ if [[ "${seclabel_mode}" == "auto" ]]; then
   if command -v virsh >/dev/null 2>&1; then
     if virsh -c "${TF_VAR_libvirt_uri}" domcapabilities 2>/dev/null | grep -q "<model>apparmor</model>"; then
       seclabel_mode="apparmor"
-    fi
-  fi
-  if [[ "${seclabel_mode}" != "apparmor" ]]; then
-    if [[ -d /sys/kernel/security/apparmor ]] || command -v aa-status >/dev/null 2>&1 || command -v apparmor_status >/dev/null 2>&1; then
-      seclabel_mode="apparmor"
     else
       seclabel_mode="none"
     fi
+  else
+    seclabel_mode="none"
   fi
 fi
 export TF_VAR_libvirt_seclabel_mode="${seclabel_mode}"
