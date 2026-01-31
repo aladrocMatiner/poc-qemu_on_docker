@@ -80,4 +80,17 @@ if [[ ! -d "${INFRA_DIR}" ]]; then
 fi
 
 cd "${INFRA_DIR}"
-exec "${TOFU_BIN}" "$@"
+
+args=("$@")
+subcommand="${args[0]:-}"
+if [[ "${TOFU_AUTO_APPROVE:-0}" == "1" ]]; then
+  case "${subcommand}" in
+    apply|destroy)
+      if [[ ! " ${args[*]} " =~ " -auto-approve " ]]; then
+        args+=("-auto-approve")
+      fi
+      ;;
+  esac
+fi
+
+exec "${TOFU_BIN}" "${args[@]}"
