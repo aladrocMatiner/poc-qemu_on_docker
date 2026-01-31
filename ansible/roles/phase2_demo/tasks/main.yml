@@ -80,21 +80,66 @@
   when: vm_runner_prepare_assets | default(false) | bool
   run_once: true
 
-- name: Download base image on all nodes (if missing)
+- name: Check local base image presence (controller)
+  ansible.builtin.stat:
+    path: "{{ base_image_local_path }}"
+  register: base_image_local_stat
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - base_image_local_path | length > 0
+  delegate_to: localhost
+  run_once: true
+
+- name: Check base image presence on nodes
+  ansible.builtin.stat:
+    path: "/var/lib/vmrunner/images/{{ base_image_name }}"
+  loop: "{{ vmrunner_hosts }}"
+  delegate_to: "{{ item }}"
+  register: base_image_stat
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - base_image_name | length > 0
+  run_once: true
+
+- name: Build list of nodes missing base image
+  ansible.builtin.set_fact:
+    base_image_missing_nodes: "{{ base_image_stat.results | selectattr('stat.exists', 'equalto', false) | map(attribute='item') | list }}"
+  when:
+    - base_image_stat is defined
+  run_once: true
+
+- name: Copy base image from controller to nodes (if local exists)
+  ansible.builtin.copy:
+    src: "{{ base_image_local_path }}"
+    dest: "/var/lib/vmrunner/images/{{ base_image_name }}"
+    mode: "0644"
+  loop: "{{ base_image_missing_nodes | default([]) }}"
+  delegate_to: "{{ item }}"
+  when:
+    - vm_runner_prepare_assets | default(false) | bool
+    - base_image_name | length > 0
+    - base_image_missing_nodes | default([]) | length > 0
+    - base_image_local_stat is defined
+    - base_image_local_stat.stat.exists
+  run_once: true
+
+- name: Download base image on missing nodes (fallback to URL)
   ansible.builtin.get_url:
     url: "{{ base_image_url }}"
     dest: "/var/lib/vmrunner/images/{{ base_image_name }}"
     mode: "0644"
     checksum: "{{ ((base_image_sha256 | length) > 0) | ternary('sha256:' + base_image_sha256, omit) }}"
-  loop: "{{ vmrunner_hosts }}"
+  loop: "{{ base_image_missing_nodes | default([]) }}"
   delegate_to: "{{ item }}"
   when:
     - vm_runner_prepare_assets | default(false) | bool
-    - base_image_url | length > 0
     - base_image_name | length > 0
+    - base_image_url | length > 0
+    - base_image_missing_nodes | default([]) | length > 0
+    - base_image_local_stat is not defined or not base_image_local_stat.stat.exists
   run_once: true
 
-- name: Check base image presence on nodes
+- name: Re-check base image presence on nodes
   ansible.builtin.stat:
     path: "/var/lib/vmrunner/images/{{ base_image_name }}"
   loop: "{{ vmrunner_hosts }}"

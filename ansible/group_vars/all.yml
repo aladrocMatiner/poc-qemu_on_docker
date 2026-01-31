@@ -10,9 +10,16 @@ vm_runner_keys_dir_container: "{{ lookup('env', 'VM_RUNNER_KEYS_DIR_CONTAINER') 
 vm_ssh_key_path_in_container: "{{ lookup('env', 'VM_SSH_KEY_PATH_IN_CONTAINER') | default('/vm/keys/id_ed25519', true) }}"
 
 lab_name: "{{ lookup('env', 'LAB_NAME') | default('swarm-lab', true) }}"
+downloads_dir: "{{ lookup('env', 'DOWNLOADS_DIR') | default('work/downloads', true) }}"
 base_image_url: "{{ lookup('env', 'BASE_IMAGE_URL') | default('', true) }}"
 base_image_name: "{{ lookup('env', 'BASE_IMAGE_NAME') | default('', true) }}"
 base_image_sha256: "{{ lookup('env', 'BASE_IMAGE_SHA256') | default('', true) }}"
+base_image_local_path: >-
+  {{ (base_image_name | length > 0) | ternary(
+       (lookup('env', 'BASE_IMAGE_LOCAL_PATH') | default('', true)) | default(downloads_dir ~ '/' ~ base_image_name, true),
+       ''
+     )
+  }}
 
 vm_runner_image_path: "{{ lookup('env', 'VM_RUNNER_IMAGE_PATH') | default('/var/lib/vmrunner/images/linux.qcow2', true) }}"
 vm_runner_seed_path: "{{ lookup('env', 'VM_RUNNER_SEED_PATH') | default('/var/lib/vmrunner/seeds/linux-seed.iso', true) }}"
